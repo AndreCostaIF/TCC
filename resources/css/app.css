@@ -1,0 +1,6 @@
+.mainBox{
+    border: 1px solid var( --primary-dark);
+    padding: 2rem;
+    border-radius: 1rem;
+}
+

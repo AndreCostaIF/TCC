@@ -1,0 +1,43 @@
+:root{
+    --primary: #000;
+    --primary-dark: #F83771;
+    --secondary:#fff;
+    --light: #e7e7e7;
+    --medium: #cacaca;
+    --dark: #a2a2a2;
+    --BD:red;
+}
+
+a{
+    text-decoration: none;
+    color: black;
+}
+
+.customLink{
+    color: var(--primary);
+}
+
+.customLink:hover{
+    color: var(--primary-dark);
+}
+
+.titleForm{
+    width: 50%;
+}
+
+.title{
+    text-transform: uppercase;
+    color: var(--BD);
+}
+
+.botaoForm{
+    border: 1px solid var( --primary-dark);
+    color: var( --primary-dark);
+}
+
+.botaoForm:hover{
+    color: var( --secondary);
+    background-color: var( --BD);
+}
+
+

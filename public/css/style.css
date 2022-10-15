@@ -1,0 +1,146 @@
+:root{
+    --primary: #000;
+    --primary-dark: #F83771;
+    --secondary:#fff;
+    --light: #e7e7e7;
+    --medium: #cacaca;
+    --dark: #a2a2a2;
+    --BD:red;
+}
+
+a{
+    text-decoration: none;
+    color: black;
+}
+
+.customLink{
+    color: var(--primary);
+}
+
+.customLink:hover{
+    color: var(--primary-dark);
+}
+
+.titleForm{
+    width: 50%;
+}
+
+.title{
+    text-transform: uppercase;
+    color: var(--BD);
+}
+
+.botaoForm{
+    border: 1px solid var( --primary-dark);
+    color: var( --primary-dark);
+}
+
+.botaoForm:hover{
+    color: var( --secondary);
+    background-color: var( --BD);
+}
+
+
+
+
+.logo{
+    max-width: 75px;
+    max-height: 75px;
+}
+
+.menu-list, .itens-menu{
+    
+    font-size: 18px;
+}
+
+.itens-menu a{
+    margin-right: 20px;
+}
+
+header {
+   
+    width: 100%;
+    background-color: red;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    transition: background ease-out 0.2s;
+}
+
+header.active{
+    position: fixed;
+    background: #fff;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+}
+
+header .collapse {
+    
+    width: auto;
+   
+}
+
+header .nav-link{
+    text-transform: uppercase;
+    font-weight: 500;
+    padding-left: 0;
+    padding-right: 0;
+    color: white;
+    border-bottom: solid 4px transparent
+}
+
+header .nav-link.active{
+    border-bottom: solid 4px var(--primary);
+    color: white;
+}
+
+header .nav-link:hover{
+    border-bottom: solid 4px var(--primary);
+    color: var(--primary);
+}
+
+
+  
+  /* The container <div> - needed to position the dropdown content */
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* Dropdown Content (Hidden by Default) */
+  .dropdown-content {
+    padding-top: 8px;
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 10px;
+    
+  }
+  
+  /* Links inside the dropdown */
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    
+  }
+  
+  /* Change color of dropdown links on hover */
+  .dropdown-content a:hover {background-color: #ddd;}
+  
+  /* Show the dropdown menu on hover */
+  .dropdown:hover .dropdown-content {display: block;}
+  
+  /* Change the background color of the dropdown button when the dropdown content is shown */
+  .dropdown:hover .nav-link { 
+    border-bottom: solid 4px var(--primary);
+    color: var(--primary);
+    }
+.mainBox{
+    border: 1px solid var( --primary-dark);
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
