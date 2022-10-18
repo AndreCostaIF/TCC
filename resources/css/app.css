@@ -4,3 +4,30 @@
     border-radius: 1rem;
 }
 
+/* *{
+    border: 1px solid red;
+} */
+.boxLogin{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px solid var(--primary-dark);
+    border-radius: 1rem;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+ */
+}
+.loginHeader{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loginHeader img{
+    max-width: 20rem;
+    max-height: 20rem;
+}
+
+.imgLogin{
+    width: 100%;
+    height: 100%;
+}

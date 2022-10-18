@@ -8,6 +8,21 @@
     --BD:red;
 }
 
+html {
+    height: 100%;
+    min-height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+footer {
+    margin-top: auto;
+}
+
 a{
     text-decoration: none;
     color: black;
@@ -30,6 +45,13 @@ a{
     color: var(--BD);
 }
 
+.subtitle{
+    text-transform: capitalize;
+    color: var(--primary);
+
+
+}
+
 .botaoForm{
     border: 1px solid var( --primary-dark);
     color: var( --primary-dark);
@@ -40,4 +62,30 @@ a{
     background-color: var( --BD);
 }
 
+.boletoPago{
+    background-color: rgb(196,221,137);
+}
+
+.boletoAberto{
+    background-color: rgb(234,208,14);
+}
+
+.boletoAtraso{
+    background-color:rgb(213,130,130);
+}
+
+.boletoAberto .botaoForm:hover, .boletoAtraso .botaoForm:hover{
+    border: 1px solid var( --primary);
+    color: var( --secondary);
+    background-color: var( --primary);
+
+}
+
+
+.boletoAberto .botaoForm,.boletoAtraso .botaoForm{
+    border: 1px solid var( --primary);
+    color: var( --primary);
+    background-color: transparent;
+
+}
 
