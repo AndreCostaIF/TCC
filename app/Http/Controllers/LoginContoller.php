@@ -39,10 +39,10 @@ class LoginContoller extends Controller
                 $this->criarSessao($dados);
 
                 if(Session::get('nome')){
-
+                    //return view('remessa');
                     return redirect()->route('remessa');
                 }else{
-                    return redirect()->route('/');
+                    return redirect()->route('index');
                 }
 
             } else {

@@ -77,6 +77,32 @@ class Santander extends BoletoAbstract
      */
     protected $ios;
 
+    /**
+     * Define o número do convênio (4, 6 ou 7 caracteres)
+     * @var string
+     */
+    protected $convenio;
+
+
+    /**
+     * Define o valor do IOS
+     *
+     * @param string $convenio
+     */
+    public function setConvenio($convenio)
+    {
+        $this->convenio = $convenio;
+    }
+
+    /**
+     * Retorna o atual valor do Convenio
+     *
+     * @return string
+     */
+    public function getConvenio()
+    {
+        return $this->convenio;
+    }
 
     /**
      * Define o valor do IOS
@@ -112,10 +138,10 @@ class Santander extends BoletoAbstract
     protected function gerarDigitoVerificadorNossoNumero() {
         $sequencial = self::zeroFill($this->getSequencial(), 12);
         $digitoVerificador = static::modulo11($sequencial);
-        
+
         return $digitoVerificador['digito'];
     }
-    
+
     /**
      * Método para gerar o código da posição de 20 a 44
      *
@@ -124,9 +150,9 @@ class Santander extends BoletoAbstract
      */
     public function getCampoLivre()
     {
-        return '9' . self::zeroFill($this->getConta(), 7) .
+        return '9' . self::zeroFill($this->getConvenio(), 7) .
             self::zeroFill($this->getSequencial(), 12) .
-            self::zeroFill($this->gerarDigitoVerificadorNossoNumero(), 1) .            
+            self::zeroFill($this->gerarDigitoVerificadorNossoNumero(), 1) .
             self::zeroFill($this->getIos(), 1) .
             self::zeroFill($this->getCarteira(), 3);
     }

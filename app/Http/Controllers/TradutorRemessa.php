@@ -19,19 +19,22 @@ class TradutorRemessa extends Controller
     }
 
     public function index(Request $request){
+
         if($this->erroAutenticado()){
             return redirect()->route('index');
-        }
-
-
-        if($request->get('remessaSantander')){
-            $remessa['remessaSantander'] = $request->get('remessaSantander');
-            $remessa['dataGerado'] = $request->get('dataGerado');
-            $remessa['horaGerado'] = $request->get('horaGerado');
-            return view('remessa', $remessa);
         }else{
-          return view('remessa');
+            if($request->get('remessaSantander')){
+                $remessa['remessaSantander'] = $request->get('remessaSantander');
+                $remessa['dataGerado'] = $request->get('dataGerado');
+                $remessa['horaGerado'] = $request->get('horaGerado');
+                return view('remessa', $remessa);
+            }else{
+              return view('remessa');
+            }
         }
+
+
+
 
     }
     function traduzir(Request $request)

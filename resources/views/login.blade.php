@@ -20,7 +20,7 @@
             <h3 class="mt-5">Sistema de Boletos</h3>
             @if (session('erro'))
             <div class="alert alert-danger" role="alert">
-                {{session('erro')}}
+                <i class="bi bi-exclamation-triangle"></i>  {{session('erro')}}
               </div>
 
             @endif
