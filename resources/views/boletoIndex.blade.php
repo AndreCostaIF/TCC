@@ -127,6 +127,7 @@
 
                             </tr>
                         @endif
+
                         @if ($boletos[$index]['reg_baixa'] == 0 && $boletos[$index]['reg_deleted'] == 0 && $vencimento > $dataAtual)
                             <tr class="boletoAberto">
                                 <th scope="row"><a

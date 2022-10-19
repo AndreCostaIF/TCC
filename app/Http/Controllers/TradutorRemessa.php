@@ -8,18 +8,21 @@ use Illuminate\Support\Facades\Storage;
 class TradutorRemessa extends Controller
 {
 
+    public function erroAutenticado(){
+        if(session()->has('nome')){
+
+            return false;
+        }else{
+            return true;
+
+        }
+    }
+
     public function index(Request $request){
-        //  $ch = curl_init();
-        //          curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-        //          curl_setopt($ch, CURLOPT_URL, "viacep.com.br/ws/59215000/json/");
+        if($this->erroAutenticado()){
+            return redirect()->route('index');
+        }
 
-        //          // Receive server response ...
-        //          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        //          //Json para Array
-        //          $municipio = json_decode(curl_exec($ch), true);
-
-        //  dd(strtoupper($municipio['uf']));
 
         if($request->get('remessaSantander')){
             $remessa['remessaSantander'] = $request->get('remessaSantander');
@@ -33,6 +36,10 @@ class TradutorRemessa extends Controller
     }
     function traduzir(Request $request)
     {
+        if($this->erroAutenticado()){
+            return redirect()->route('index');
+        }
+
         date_default_timezone_set("America/Sao_Paulo");
 
         $name = $request->file('arq')->store('public/remessa');

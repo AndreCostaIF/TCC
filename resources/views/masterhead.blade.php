@@ -18,15 +18,10 @@
  <header class="mb-5">
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-light justify-content-between">
-            <a class="navbar-brand" href="#">
-                <img src="" class="img-fluid logo" />
-            </a>
-
             <div class="collapse navbar-collapse menu-list">
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link " href="{{route('remessa')}}"><i class="bi bi-file-earmark-arrow-up"></i> Remessa </a>
-
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('retorno')}}"><i class="bi bi-file-earmark-arrow-down"></i> Retorno</a>
                     </li>
@@ -35,25 +30,25 @@
                     </li>
 
 
+                </ul>
+            </div>
+
+            <div class="collapse aling-content-center navbar-collapse flex-row-reverse" id="navbarNav">
+                <ul class="navbar-nav itens-menu align-items-center">
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <a class="nav-link">{{session()->get('nome')}} <i class="bi bi-caret-down"></i></a>
+                            <div class="dropdown-content">
+                                <a href="{{route('remessa')}}"><i class="bi bi-file-earmark-arrow-up"></i> Remessa </a>
+                                <a href="{{route('retorno')}}"><i class="bi bi-file-earmark-arrow-down"></i> Retorno</a>
+                                <a href="{{route('logout')}}"><i class="bi bi-box-arrow-right"></i> Sair</a>
+                            </div>
+                        </div>
+                    </li>
 
 
                 </ul>
             </div>
-{{--
-            <div class="collapse navbar-collapse flex-row-reverse" id="navbarNav">
-                <ul class="navbar-nav itens-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="bi bi-search"></i></a>
-
-                    </li>
-                    <!-- <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight"
-                            aria-controls="offcanvasRight" href="#"><i class="bi bi-cart"></i></a>
-                    </li> -->
-
-
-                </ul>
-            </div> --}}
         </nav>
     </div>
 </header>
