@@ -6,6 +6,7 @@
     integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 <title>Módulos boletos</title>
+<link rel="icon" type="image/x-icon" href="{{asset('assets/favicon-intelnet.ico')}}">
 
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
@@ -16,15 +17,12 @@
     <div class="container ">
         <div class="loginHeader mt-5">
             <img src="{{ asset('assets/logo.svg') }}" class="col-6" alt="">
-
             <h3 class="mt-5">Sistema de Boletos</h3>
             @if (session('erro'))
-            <div class="alert alert-danger" role="alert">
-                <i class="bi bi-exclamation-triangle"></i>  {{session('erro')}}
-              </div>
-
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> {{session('erro')}}
+                </div>
             @endif
-
         </div>
 
         <div class="d-flex justify-content-center mt-3">
