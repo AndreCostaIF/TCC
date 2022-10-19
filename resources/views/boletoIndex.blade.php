@@ -51,10 +51,10 @@
                     <tr class="">
                         @if (isset($cliente['nome']))
                             <th scope="row">{{ $cliente['nome'] }} </th>
-                            <td>{{ $cliente['cpf'] }}</td>
+                            <td>{{ formatarCpf($cliente['cpf']) }}</td>
                         @elseif (isset($cliente['fantasia']))
                             <th scope="row">{{ $cliente['fantasia'] }} </th>
-                            <td>{{ $cliente['cnpj'] }}</td>
+                            <td>{{ formatarCnpj($cliente['cnpj']) }}</td>
                         @endif
                         <td>
                             <a href="{{ route('listarBoletos', [$cliente['id'], $flag]) }}"
@@ -101,11 +101,7 @@
                         {{-- BOLETOS PAGOS --}}
 
                         @php
-                            $vencimento = $boletos[$index]['reg_vencimento'];
-
-                            $d = explode('/', $vencimento);
-                            $vencimento = $d[2] . '-' . $d[1] . '-' . $d[0];
-                            $dataAtual = date('y-m-d');
+                            $vencimento = substr($boletos[$index]['reg_vencimento'], 2, 8);
 
                         @endphp
 
@@ -115,11 +111,11 @@
                                         href="http://177.223.83.142/admin/clientes/visualizar/id/{{ $cliente['idCliente'] }}"
                                         target="_blank">{{ $cliente['nome'] }}</a> </th>
                                 <td>{{ $boletos[$index]['id'] }}</td>
-                                <td>{{ $boletos[$index]['reg_lancamento'] }}</td>
-                                <td>{{ $boletos[$index]['reg_vencimento'] }}</td>
-                                <td>{{ $boletos[$index]['bx_pagamento'] }}</td>
-                                <td>R${{ $boletos[$index]['reg_valor'] }}</td>
-                                <td>R${{ $boletos[$index]['bx_valor_pago'] }}</td>
+                                <td>{{ formatDateAndTime($boletos[$index]['reg_lancamento']) }}</td>
+                                <td>{{ formatDateAndTime($boletos[$index]['reg_vencimento']) }}</td>
+                                <td>{{ formatDateAndTime($boletos[$index]['bx_pagamento']) }}</td>
+                                <td>R${{ formatNumber($boletos[$index]['reg_valor']) }}</td>
+                                <td>R${{ formatNumber($boletos[$index]['bx_valor_pago']) }}</td>
                                 <td>
                                     <button class="btn botaoForm bg-success text-white border-success" id="botaoForm"
                                         disabled><i class="bi bi-check2-circle"></i> Pago</button>
@@ -127,16 +123,16 @@
 
                             </tr>
                         @endif
-                        @if ($boletos[$index]['reg_baixa'] == 0 && $boletos[$index]['reg_deleted'] == 0 && $vencimento > $dataAtual)
+                        @if ($boletos[$index]['reg_baixa'] == 0 && $boletos[$index]['reg_deleted'] == 0 && $vencimento > date('y-m-d'))
                             <tr class="boletoAberto">
                                 <th scope="row"><a
                                         href="http://177.223.83.142/admin/clientes/visualizar/id/{{ $cliente['idCliente'] }}"
                                         target="_blank">{{ $cliente['nome'] }}</a> </th>
                                 <td>{{ $boletos[$index]['id'] }}</td>
-                                <td>{{ $boletos[$index]['reg_lancamento'] }}</td>
-                                <td>{{ $boletos[$index]['reg_vencimento'] }}</td>
+                                <td>{{ formatDateAndTime($boletos[$index]['reg_lancamento']) }}</td>
+                                <td>{{ formatDateAndTime($boletos[$index]['reg_vencimento']) }}</td>
                                 <td></td>
-                                <td>R${{ $boletos[$index]['reg_valor'] }}</td>
+                                <td>R${{ formatNumber($boletos[$index]['reg_valor']) }}</td>
                                 <td>R$00,00</td>
                                 <td>
                                     <a href="{{ route('imprimirBoleto', [$boletos[$index]['id']]) }}"
@@ -146,16 +142,19 @@
 
                             </tr>
                         @endif
-                        @if ($vencimento < $dataAtual && $boletos[$index]['reg_baixa'] == 0 && $boletos[$index]['reg_deleted'] == 0)
+
+
+                        @if ($vencimento <  date('y-m-d') && $boletos[$index]['reg_baixa'] == 0 && $boletos[$index]['reg_deleted'] == 0)
                             <tr class="boletoAtraso">
                                 <th scope="row"><a
                                         href="http://177.223.83.142/admin/clientes/visualizar/id/{{ $cliente['idCliente'] }}"
                                         target="_blank">{{ $cliente['nome'] }}</a> </th>
                                 <td>{{ $boletos[$index]['id'] }}</td>
-                                <td>{{ $boletos[$index]['reg_lancamento'] }}</td>
-                                <td>{{ $boletos[$index]['reg_vencimento'] }}</td>
+
+                                <td>{{ formatDateAndTime($boletos[$index]['reg_lancamento']) }}</td>
+                                <td>{{ formatDateAndTime($boletos[$index]['reg_vencimento']) }}</td>
                                 <td></td>
-                                <td>R${{ $boletos[$index]['reg_valor'] }}</td>
+                                <td>R${{ formatNumber($boletos[$index]['reg_valor']) }}</td>
                                 <td>R$00,00</td>
                                 <td>
                                     <a href="{{ route('imprimirBoleto', [$boletos[$index]['id']]) }}"

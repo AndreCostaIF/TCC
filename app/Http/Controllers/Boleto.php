@@ -24,21 +24,27 @@ class Boleto extends Controller
         return view('boletoIndex');
     }
 
+
     public function buscarCliente(Request $request){
+
+
         $search =  $request->get('campoBusca');
         $flag = $request->get('flag');
+
+
+
 
         if ($flag == "nome" || $flag == "cpf") {
 
             if ($flag == "nome") {
                 $pessoaFisica =  json_decode(Pessoa_fisica::where([
-                    ['nome', 'like', '%' . $search . '%']
+                    ['nome', 'like', $search . '%']
                 ])->get(), true);
-
 
                 $data['clientesBusca'] = $pessoaFisica;
 
             }else{
+                $search = somentoNumeroCpfOuCnpj($search);
                 $pessoaFisica =  json_decode(Pessoa_fisica::where([
                     ['cpf', $search]
                 ])->get(), true);
@@ -58,6 +64,7 @@ class Boleto extends Controller
                 $data['clientesBusca'] = $pessoaJuridica;
 
             }else{
+                $search = somentoNumeroCpfOuCnpj($search);
                 $pessoaJuridica =  json_decode(PessoaJuridica::where([
                     ['cnpj', $search]
                 ])->get(), true);
@@ -103,24 +110,6 @@ class Boleto extends Controller
                 $financeiro = json_decode(Financeiros::where([
                     ['cliente_id_web', $cliente['id']]
                 ])->get(), true);
-                $i = 0;
-                foreach ($financeiro as $item) {
-
-                    $date = new DateTime($item['reg_vencimento']);
-                    $financeiro[$i]['reg_vencimento'] = '' . $date->format('d/m/y');
-
-                    $date = new DateTime($item['reg_lancamento']);
-                    $financeiro[$i]['reg_lancamento'] = "" . $date->format('d/m/y');
-
-                    $date = new DateTime($item['bx_pagamento']);
-                    $financeiro[$i]['bx_pagamento'] = "" . $date->format('d/m/y');
-
-                    $financeiro[$i]['reg_valor'] = number_format($financeiro[$i]['reg_valor'], 2, ',');
-
-                    $financeiro[$i]['bx_valor_pago'] = number_format($financeiro[$i]['bx_valor_pago'], 2, ',');
-
-                    $i++;
-                }
 
 
                 $data['boletos'] = $financeiro;
@@ -149,24 +138,7 @@ class Boleto extends Controller
                 $financeiro = json_decode(Financeiros::where([
                     ['cliente_id_web', $cliente['id']]
                 ])->get(), true);
-                $i = 0;
-                foreach ($financeiro as $item) {
 
-                    $date = new DateTime($item['reg_vencimento']);
-                    $financeiro[$i]['reg_vencimento'] = $date->format('d/m/y');
-
-                    $date = new DateTime($item['reg_lancamento']);
-                    $financeiro[$i]['reg_lancamento'] = $date->format('d/m/y');
-
-                    $date = new DateTime($item['bx_pagamento']);
-                    $financeiro[$i]['bx_pagamento'] = $date->format('d/m/y');
-
-                    $financeiro[$i]['reg_valor'] = number_format($financeiro[$i]['reg_valor'], 2, ',');
-
-                    $financeiro[$i]['bx_valor_pago'] = number_format($financeiro[$i]['bx_valor_pago'], 2, ',');
-
-                    $i++;
-                }
                 $pessoaJuridica['nome'] = $pessoaJuridica['fantasia'];
                 $data['boletos'] = $financeiro;
                 $data['cliente'] = $pessoaJuridica;
@@ -231,9 +203,9 @@ class Boleto extends Controller
                 'sacado' => $sacado,
                 'cedente' => $cedente,
                 'agencia' => 4543, // Até 4 dígitos
-                'carteira' => 102,
-                'conta' => 1040300, // Até 8 dígitos
-                'convenio' => 1234, // 4, 6 ou 7 dígitos
+                'carteira' => 101,
+                'conta' => 1300398, // Até 8 dígitos
+                'convenio' => 9818596, // 4, 6 ou 7 dígitos
             ));
 
             $msg = str_replace("\n","<br>", $boleto['descricao']);
@@ -281,9 +253,9 @@ class Boleto extends Controller
                 'sacado' => $sacado,
                 'cedente' => $cedente,
                 'agencia' => 4543, // Até 4 dígitos
-                'carteira' => 102,
-                'conta' => 1040300, // Até 8 dígitos
-                'convenio' => 1234, // 4, 6 ou 7 dígitos
+                'carteira' => 101,
+                'conta' => 1300398, // Até 8 dígitos
+                'convenio' => 9818596, // 4, 6 ou 7 dígitos
             ));
 
             $msg = str_replace("\n","<br>", $boleto['descricao']);
