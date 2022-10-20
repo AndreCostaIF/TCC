@@ -28,16 +28,20 @@ class Boleto extends Controller
 
         }
     }
-    public function index()
+    public function index($data = null)
     {
         if($this->erroAutenticado()){
             return redirect()->route('index');
         }else{
-            return view('boletoIndex');
+            if($data != null){
+
+                return view('boletoIndex', $data);
+            }else{
+                return view('boletoIndex');
+            }
         }
 
     }
-
 
     public function buscarCliente(Request $request){
 
@@ -47,7 +51,7 @@ class Boleto extends Controller
         $search =  $request->get('campoBusca');
         $flag = $request->get('flag');
 
-
+        //dd($flag);
 
 
         if ($flag == "nome" || $flag == "cpf") {
@@ -57,7 +61,7 @@ class Boleto extends Controller
                     ['nome', 'like', $search . '%']
                 ])->orderBy('nome', 'asc')->paginate(10);
 
-                $data['clientesBusca'] = $pessoaFisica;
+                $data['clientesBusca'] =  $pessoaFisica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
 
             }else{
                 $search = somentoNumeroCpfOuCnpj($search);
@@ -66,18 +70,18 @@ class Boleto extends Controller
                 ])->orderBy('nome', 'asc')->paginate(10);
 
 
-                $data['clientesBusca'] = $pessoaFisica;
+                $data['clientesBusca'] = $pessoaFisica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
 
             } $data['flag'] = 'cpf';
         }elseif($flag == "fantasia" || $flag == "cnpj"){
             if($flag == "fantasia"){
                 $pessoaJuridica =  PessoaJuridica::where([
-                    ['fantasia', 'like', '%' . $search . '%']
-                ])->orderBy('nome', 'asc')->paginate(10);
+                    ['fantasia', 'like', $search . '%']
+                ])->orderBy('fantasia', 'asc')->paginate(10);
 
 
 
-                $data['clientesBusca'] = $pessoaJuridica;
+                $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
 
             }else{
                 $search = somentoNumeroCpfOuCnpj($search);
@@ -86,15 +90,14 @@ class Boleto extends Controller
                 ])->orderBy('fantasia', 'asc')->paginate(10);
 
 
-                $data['clientesBusca'] = $pessoaJuridica;
+                $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
             }
             $data['flag'] = 'cnpj';
 
         }
 
         return view('boletoIndex', $data);
-
-    }
+      }
 
     public function listarBoletos($id = null, $flag = null)
     {

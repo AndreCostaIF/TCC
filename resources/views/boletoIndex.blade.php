@@ -1,13 +1,11 @@
 @include('masterhead')
 
-
-
 <div class="">
     <h3 class="subtitle">buscar boletos</h3>
 </div>
 
 <div class="col-md-6 mt-3 ">
-    <form action="{{ route('buscarCliente') }}" method="POST" class="d-flex justify-content-between align-items-center">
+    <form action="{{ route('buscarCliente') }}" method="GET" class="d-flex justify-content-between align-items-center">
         @csrf
         <div class="form-floating col-md-3">
             <select class="form-select" id="flag" name="flag" aria-label="Floating label select example" required>
@@ -16,7 +14,6 @@
                 <option value="nome">Nome</option>
                 <option value="cnpj">CNPJ</option>
                 <option value="fantasia">Fantasia</option>
-
             </select>
             <label for="floatingSelect">Buscar por</label>
         </div>
@@ -41,11 +38,8 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-
                     <th scope="col">Cliente</th>
                     <th scope="col">CPF/CNPJ</th>
-
-
                 </tr>
             </thead>
             <tbody>
@@ -65,7 +59,6 @@
                         </td>
                     </tr>
                 @endforeach
-
             </tbody>
         </table>
         <div class="mb-3 d-flex justify-content-center">
@@ -82,18 +75,12 @@
             <table class="table  table-hover">
                 <thead>
                     <tr>
-
                         <th scope="col">Cliente</th>
                         <th scope="col">ID</th>
-
-
-
                         <th scope="col">Lançamento</th>
                         <th scope="col">Vencimento</th>
-
                         <th scope="col">Pagamento</th>
                         <th scope="col">Valor a pagar</th>
-
                         <th scope="col">Valor pago</th>
                         <th></th>
                     </tr>

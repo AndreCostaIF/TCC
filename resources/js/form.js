@@ -3,6 +3,3 @@ $('#flag').on('change', function() {
     console.log($('#campoBusca').text(this.value.toUpperCase()))
   });
 
-
-
-

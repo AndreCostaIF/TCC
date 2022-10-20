@@ -24,8 +24,11 @@ class LoginContoller extends Controller
         $credenciais = json_decode(Login::where([
             ['user', $usuario]
         ])->get(), true);
-        $credenciais = $credenciais[0];
 
+        if($credenciais == []){
+            return redirect()->back()->with('erro', "Usuário ou senha incorreta!");
+        }
+        $credenciais = $credenciais[0];
         //dd($credenciais);
         if ($credenciais['grupo_users_id'] == 9 || $credenciais['grupo_users_id'] == 1) {
             if (password_verify($senha, $credenciais['pass'])) {
@@ -48,7 +51,7 @@ class LoginContoller extends Controller
             } else {
 
 
-                return redirect()->back()->with('erro', "usuario ou senha incorreta");
+                return redirect()->back()->with('erro', "Usuário ou senha incorreta");
             }
         } else {
             return redirect()->back()->with('erro', "Acesso negado!");
