@@ -42,7 +42,7 @@
                             <div class="dropdown-content">
                                 <a href="{{route('remessa')}}"><i class="bi bi-file-earmark-arrow-up"></i> Remessa </a>
                                 <a href="{{route('retorno')}}"><i class="bi bi-file-earmark-arrow-down"></i> Retorno</a>
-                                <a href="{{route('logout')}}"><i class="bi bi-box-arrow-right"></i> Sair</a>
+                                <a href="{{route('logout')}}"><i class="bi bi-box-arrow-right text-danger"></i> Sair</a>
                             </div>
                         </div>
                     </li>

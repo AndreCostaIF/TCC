@@ -114,7 +114,7 @@
                                 <th scope="row"><a
                                         href="http://177.223.83.142/admin/clientes/visualizar/id/{{ $cliente['idCliente'] }}"
                                         target="_blank">{{ $cliente['nome'] }}</a> </th>
-                                <td>{{ $boleto->id }}</td>
+                                <td class="idBoleto">{{ $boleto->id }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->bx_pagamento) }}</td>
@@ -127,12 +127,12 @@
 
                             </tr>
                         @endif
-                        @if ($boleto->reg_baixa == 0 && $boleto->reg_deleted == 0 && $vencimento > date('y-m-d'))
+                        @if ($boleto->reg_baixa == 0 && $boleto->reg_deleted == 0 && $vencimento >= date('y-m-d'))
                             <tr class="boletoAberto">
                                 <th scope="row"><a
                                         href="http://177.223.83.142/admin/clientes/visualizar/id/{{ $cliente['idCliente'] }}"
                                         target="_blank">{{ $cliente['nome'] }}</a> </th>
-                                <td>{{ $boleto->id }}</td>
+                                <td >{{ $boleto->id }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
                                 <td></td>

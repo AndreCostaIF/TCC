@@ -33,3 +33,5 @@ Route::get('/boletos/imprimir/{id}',  [Boleto::class, 'emitirBoletoUnitario'])->
 Route::post('/boletos/clientes',  [Boleto::class, 'buscarCliente'])->name('buscarCliente');
 
 
+
+
