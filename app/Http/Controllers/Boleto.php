@@ -300,14 +300,15 @@ class Boleto extends Controller
 
     public function boletosMassaView(){
 
-        return view('massa');
+        $dados['data'] = "";
+        return view('massa', $dados);
     }
 
     //GERAR BOLETOS EM MASSA, IMPRIMIR TODOS OS BOLETOS, DE 200 EM 200
     public function boletosEmMassa(Request $request){
 
-        $search =  $request->get('campoBusca');
-
+        $search =  $request->get('data');
+        //dd($search);
 
 
         //dd($search);
@@ -315,10 +316,11 @@ class Boleto extends Controller
             ['reg_lancamento', 'like', $search . '%']
         ])->paginate(200);
 
+        $boleto->withPath("/boletos/massa/buscar?data=".$search);
         $dados["boletos"] = $boleto;
+        $dados['data'] = $search;
 
-
-
+        //dd($dados["boletos"]);
         return view('massa', $dados);
 
 

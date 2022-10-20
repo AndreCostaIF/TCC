@@ -34,4 +34,21 @@
             return $numero;
 
     }
+
+    function _v($arr,$key=null){
+
+        if (isset($arr[$key])){
+            return $arr[$key];
+        } else {
+            return null;
+        }
+    }
+
+    function existe($data){
+        if (isset($data)){
+            return $data;
+        } else {
+            return null;
+        }
+    }
 ?>
