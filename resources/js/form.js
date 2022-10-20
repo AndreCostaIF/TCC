@@ -5,4 +5,17 @@ $('#flag').on('change', function() {
 
 
 
+    if ( $( ".idBoleto" ).length ) {
+
+        if ( $( ".imprimirTodos" ).length ) {
+
+            boletos = [];
+            $('.idBoleto').each(function(i, obj) {
+                boletos.push(obj.textContent)
+            });
+            $( ".imprimirTodos" ).val(boletos)
+            console.log($( ".idBoleto" ));
+        }
+    }
+
 

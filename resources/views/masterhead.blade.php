@@ -27,6 +27,9 @@
                         <a class="nav-link" href="{{route('retorno')}}"><i class="bi bi-file-earmark-arrow-down"></i> Retorno</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{route('massaView')}}"><i class="bi bi-receipt-cutoff"></i>Boletos em Massa </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{route('buscarBoleto')}}"><i class="bi bi-search"></i> buscar boleto</a>
                     </li>
 
