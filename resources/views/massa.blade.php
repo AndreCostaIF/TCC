@@ -5,12 +5,12 @@
 </div>
 
 <div class="col-md-5 mt-3 ">
-    <form action="{{ route('massa') }}" method="POST" class="d-flex justify-content-around align-items-center">
+    <form action="{{ route('massa') }}" method="GET" class="d-flex justify-content-around align-items-center">
         @csrf
 
 
         <div class="form-floating col-md-6">
-            <input type="date" class="form-control" name="campoBusca" id="floatingInput"
+            <input type="date" class="form-control" value="2022-09-25" name="data" id="floatingInput"
                 placeholder="name@example.com" required>
             <label for="floatingInput" id="campoBusca">Informe a data</label>
         </div>
@@ -32,7 +32,7 @@
             <form action="{{route('imprimirMassa')}}" method="POST">
                 @csrf
                 <input type="hidden" name="imprimirTodos" class="imprimirTodos" value="">
-                <button type="submit"  class="btn botaoForm "  id="botaoForm"><i class="bi bi-search"></i> Imprimir todos!</button>
+                <button type="submit"  class="btn botaoForm "  id="botaoForm"><i class="bi bi-printer"></i> Imprimir todos</button>
             </form>
             <table class="table  table-hover">
                 <thead>

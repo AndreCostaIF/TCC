@@ -18,4 +18,3 @@ $('#flag').on('change', function() {
         }
     }
 
-
