@@ -53,17 +53,17 @@ class Boleto extends Controller
         if ($flag == "nome" || $flag == "cpf") {
 
             if ($flag == "nome") {
-                $pessoaFisica =  json_decode(Pessoa_fisica::where([
+                $pessoaFisica =  Pessoa_fisica::where([
                     ['nome', 'like', $search . '%']
-                ])->get(), true);
+                ])->orderBy('nome', 'asc')->paginate(10);
 
                 $data['clientesBusca'] = $pessoaFisica;
 
             }else{
                 $search = somentoNumeroCpfOuCnpj($search);
-                $pessoaFisica =  json_decode(Pessoa_fisica::where([
+                $pessoaFisica =  Pessoa_fisica::where([
                     ['cpf', $search]
-                ])->get(), true);
+                ])->orderBy('nome', 'asc')->paginate(10);
 
 
                 $data['clientesBusca'] = $pessoaFisica;
@@ -71,9 +71,9 @@ class Boleto extends Controller
             } $data['flag'] = 'cpf';
         }elseif($flag == "fantasia" || $flag == "cnpj"){
             if($flag == "fantasia"){
-                $pessoaJuridica =  json_decode(PessoaJuridica::where([
+                $pessoaJuridica =  PessoaJuridica::where([
                     ['fantasia', 'like', '%' . $search . '%']
-                ])->get(), true);
+                ])->orderBy('nome', 'asc')->paginate(10);
 
 
 
@@ -81,9 +81,9 @@ class Boleto extends Controller
 
             }else{
                 $search = somentoNumeroCpfOuCnpj($search);
-                $pessoaJuridica =  json_decode(PessoaJuridica::where([
+                $pessoaJuridica =  PessoaJuridica::where([
                     ['cnpj', $search]
-                ])->get(), true);
+                ])->orderBy('fantasia', 'asc')->paginate(10);
 
 
                 $data['clientesBusca'] = $pessoaJuridica;
@@ -114,20 +114,21 @@ class Boleto extends Controller
 
                 $pessoaFisica = $pessoaFisica[0];
 
-
                 $cliente = json_decode(Clientes::where(
                     'pessoa_fisica_id',
                     $id
                 )->get(), true);
 
-
-
                 $cliente = $cliente[0];
 
                 $pessoaFisica['idCliente'] = $cliente['id'];
-                $financeiro = json_decode(Financeiros::where([
+
+                $financeiro = Financeiros::where([
                     ['cliente_id_web', $cliente['id']]
-                ])->get(), true);
+                ])->orderBy('reg_vencimento', 'desc')->paginate(10);
+
+
+
 
 
                 $data['boletos'] = $financeiro;
@@ -153,9 +154,9 @@ class Boleto extends Controller
                 $cliente = $cliente[0];
 
                 $pessoaJuridica['idCliente'] = $cliente['id'];
-                $financeiro = json_decode(Financeiros::where([
+                $financeiro = Financeiros::where([
                     ['cliente_id_web', $cliente['id']]
-                ])->get(), true);
+                ])->orderBy('reg_vencimento', 'desc')->paginate(10);
 
                 $pessoaJuridica['nome'] = $pessoaJuridica['fantasia'];
                 $data['boletos'] = $financeiro;
