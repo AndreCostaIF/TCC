@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 class TradutorRetorno extends Controller
 {
 
+    public function erroAutenticado(){
+        if(session()->has('nome')){
+
+            return false;
+        }else{
+            return true;
+
+        }
+    }
     private function completarPosicoes($campo, $posicoes, $complemento)
     {
         //verifica se o valor total de É MAIOR QUE
@@ -23,7 +32,9 @@ class TradutorRetorno extends Controller
     }
 
     public function index(Request $request){
-
+        if($this->erroAutenticado()){
+            return redirect()->route('index');
+        }
         //dd($request->get('retornoBradesco'));
 
         if($request->get('retornoBradesco')){
@@ -39,7 +50,9 @@ class TradutorRetorno extends Controller
 
     public function traduzirRetorno(Request $request)
     {
-
+        if($this->erroAutenticado()){
+            return redirect()->route('index');
+        }
         date_default_timezone_set("America/Sao_Paulo");
 
 

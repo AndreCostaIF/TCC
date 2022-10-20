@@ -19,15 +19,31 @@ use Illuminate\Http\Request;
 
 class Boleto extends Controller
 {
+    public function erroAutenticado(){
+        if(session()->has('nome')){
+
+            return false;
+        }else{
+            return true;
+
+        }
+    }
     public function index()
     {
-        return view('boletoIndex');
+        if($this->erroAutenticado()){
+            return redirect()->route('index');
+        }else{
+            return view('boletoIndex');
+        }
+
     }
 
 
     public function buscarCliente(Request $request){
 
-
+        if($this->erroAutenticado()){
+            return redirect()->route('index');
+        }
         $search =  $request->get('campoBusca');
         $flag = $request->get('flag');
 
@@ -84,7 +100,9 @@ class Boleto extends Controller
     {
 
 
-
+        if($this->erroAutenticado()){
+            return redirect()->route('index');
+        }
 
         if ($flag == "cpf") {
 
@@ -153,7 +171,9 @@ class Boleto extends Controller
 
     public function emitirBoletoUnitario($id = null)
     {
-
+        if($this->erroAutenticado()){
+            return redirect()->route('index');
+        }
 
         $boleto = json_decode(Financeiros::where([
             ['id', $id]

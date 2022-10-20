@@ -18,6 +18,13 @@
             <img src="{{ asset('assets/logo.svg') }}" class="col-6" alt="">
 
             <h3 class="mt-5">Sistema de Boletos</h3>
+            @if (session('erro'))
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-exclamation-triangle"></i>  {{session('erro')}}
+              </div>
+
+            @endif
+
         </div>
 
         <div class="d-flex justify-content-center mt-3">
@@ -28,18 +35,18 @@
             <div class="col-4 boxLogin">
                 <div>
                     <h4 class=" mt-3">Login</h4>
-                    <form action="">
+                    <form action="{{route('login')}}" method="POST">
                         @csrf
                         <div class="form-floating">
-                            <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com"
+                            <input type="text" name="usuario" class="form-control" placeholder="usuario"
                                 required>
-                            <label for="floatingInput" id="campoBusca">Usuario</label>
+                            <label for="floatingInput"  id="usuario">Usuario</label>
                         </div>
 
                         <div class="form-floating mt-3">
-                            <input type="password" class="form-control" id="floatingInput"
-                                placeholder="name@example.com" required>
-                            <label for="floatingInput" id="campoBusca">Senha</label>
+                            <input type="password"  name="senha" class="form-control" placeholder="senha"
+                               required>
+                            <label for="floatingInput" id="senha">Senha</label>
                         </div>
 
                         <div class="form-floating mt-3 mb-3 text-center">
