@@ -15,14 +15,15 @@
 
 
             <div class="form-floating col-md-6">
-                <input type="date" class="form-control" name="data" id="floatingInput" placeholder="name@example.com"
-                    required>
+                <input type="date" class="form-control" name="data" id="floatingInput"
+                    placeholder="name@example.com" required>
                 <label for="floatingInput" id="campoBusca">Informe a data</label>
             </div>
 
             <div class="">
 
-                <button type="submit" class="btn btn-outline-danger" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
+                <button type="submit" class="btn btn-outline-danger" id="botaoForm"><i class="bi bi-search"></i>
+                    Buscar</button>
             </div>
 
 
@@ -30,37 +31,38 @@
     </div>
 </div>
 <div class="mt-3 ">
+    <table class="table  table-hover">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Lançamento</th>
+                <th scope="col">Vencimento</th>
+                <th scope="col">Valor a pagar</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        @if (isset($boletos))
 
 
-    @if (isset($boletos))
 
 
+            <div class="mt-5">
+                <div class=" d-flex justify-content-center">
+
+                    {{ $boletos->links() }}
+                </div>
+                @if ($boletos->total() > 0)
+                    <form action="{{ route('imprimirMassa') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="imprimirTodos" class="imprimirTodos" value="">
+                        <button type="submit" class="btn btn-outline-danger " id="botaoForm"><i
+                                class="bi bi-printer"></i> Imprimir
+                            todos</button>
+                    </form>
+                @endif
 
 
-        <div class="mt-5">
-            <div class=" d-flex justify-content-center">
-
-                {{ $boletos->links() }}
-            </div>
-            @if ($boletos->total() > 0)
-                <form action="{{ route('imprimirMassa') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="imprimirTodos" class="imprimirTodos" value="">
-                    <button type="submit" class="btn btn-outline-danger " id="botaoForm"><i class="bi bi-printer"></i> Imprimir
-                        todos</button>
-                </form>
-            @endif
-
-            <table class="table  table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Lançamento</th>
-                        <th scope="col">Vencimento</th>
-                        <th scope="col">Valor a pagar</th>
-                        <th></th>
-                    </tr>
-                </thead>
                 <tbody>
 
                     @for ($index = 0; $index < count($boletos); $index++)
@@ -75,19 +77,25 @@
 
                         </tr>
                     @endfor
-                </tbody>
-            </table>
-        </div>
-        @if ($boletos->total() <= 0)
-            <div class="mt-4">
-                <div class="alert alert-danger " role="alert">
 
-                    <div>
-                        <i class="bi bi-exclamation-triangle-fill"></i><b>Nenhum boleto encontrado!</b> Por favor, selecione outra data.
-                    </div>
-                </div>
+                </tbody>
+
             </div>
         @endif
+    </table>
+    @if (isset($boletos))
+
+    @if ($boletos->total() <= 0)
+                <div class="mt-4">
+                    <div class="alert alert-danger " role="alert">
+
+                        <div>
+                            <i class="bi bi-exclamation-triangle-fill"></i><b>Nenhum boleto encontrado!</b> Por favor,
+                            selecione outra data.
+                        </div>
+                    </div>
+                </div>
+            @endif
     @endif
 </div>
 @include('footer')
