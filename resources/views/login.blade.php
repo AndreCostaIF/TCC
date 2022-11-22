@@ -47,7 +47,7 @@
                         </div>
 
                         <div class="form-floating mt-3 mb-3 text-center">
-                            <button type="submit" class="btn btn-outline-info" id="botaoForm">Entrar</button>
+                            <button type="submit" class="btn btn-outline-danger" id="botaoForm">Entrar</button>
                         </div>
                     </form>
                 </div>
