@@ -1,13 +1,13 @@
 @include('masterhead')
 
 <div class="text-center mt-5">
-    <h3 class="title">Converter retorno <b>santander</b> <i class="bi bi-arrow-right"></i> <b>BRADESCO</b></h3>
+    <h3 class="title text-danger">Converter retorno <b>santander</b> <i class="bi bi-arrow-right"></i> <b>BRADESCO</b></h3>
 </div>
 
 <div class="d-flex justify-content-center mt-5 w-100">
     <div class="w-30 mainBox">
         <div class="text-center">
-            <h6 class="title">Envie um RETORNO do <u>SANTANDER</u></h6>
+            <h6 class="title text-danger">Envie um RETORNO do <u>SANTANDER</u></h6>
         </div>
 
         <form method="POST" action="{{route('traduzirRetorno')}}" method="POST" enctype="multipart/form-data">
@@ -47,7 +47,7 @@
 </div>
 
 <div class="text-center border-top mt-3 border-bottom">
-    <h6 class="title">Dados da conversão</h6>
+    <h6 class="title text-danger">Dados da conversão</h6>
     <p>Gerado em {{$dataGerado}} às {{$horaGerado}}</p>
 </div>
 

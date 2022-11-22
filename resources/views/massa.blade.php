@@ -1,7 +1,7 @@
 @include('masterhead')
 
 <div class="row">
-    <span class="title h2 text-center">Imprimir boletos em massa</span>
+    <span class="title text-danger h2 text-center">Imprimir boletos em massa</span>
 </div>
 
 <div class="mt-5 text-center">
