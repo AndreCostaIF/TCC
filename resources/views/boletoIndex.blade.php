@@ -4,6 +4,8 @@
     <h3 class="subtitle">buscar boletos</h3>
 </div>
 
+
+
 <div class="col-md-6 mt-3 ">
     <form action="{{ route('buscarCliente') }}" method="GET" class="d-flex justify-content-between align-items-center">
         @csrf
@@ -33,6 +35,14 @@
     </form>
 </div>
 
+@if (session()->has('erroCliente'))
+<div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+    <strong> {{session()->get('erroCliente')}}!</strong> Algo de inesperado aconteceu :(
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+@endif
+
 @if (isset($clientesBusca))
     <div class="mt-5">
         <table class="table table-striped table-hover">
@@ -46,7 +56,7 @@
                 @foreach ($clientesBusca as $cliente)
                     <tr class="">
                         @if (isset($cliente->nome))
-                            <th scope="row">{{ $cliente->nome }} </th>
+                            <th scope="row">{{ $cliente->nome }}</th>
                             <td>{{ formatarCpf($cliente->cpf) }}</td>
                         @elseif (isset($cliente->fantasia))
                             <th scope="row">{{ $cliente->fantasia}} </th>
@@ -54,8 +64,9 @@
                         @endif
                         <td>
                             <a href="{{ route('listarBoletos', [$cliente->id, $flag]) }}"
-                                class="btn botaoForm bg-success text-white border-success" id="botaoForm"><i
-                                    class="bi bi-receipt-cutoff"></i> Ver boletos</a>
+                                class="btn botaoForm bg-success text-white border-success" id="botaoForm">
+                                <i class="bi bi-receipt-cutoff"></i> Ver boletos
+                            </a>
                         </td>
                     </tr>
                 @endforeach
@@ -93,7 +104,6 @@
 
                         @php
                             $vencimento = substr($boleto->reg_vencimento, 2, 8);
-
                         @endphp
 
                         @if ($boleto->reg_baixa != 0 && $boleto->reg_deleted == 0)
@@ -126,7 +136,7 @@
                                 <td>R${{ formatNumber($boleto->reg_valor) }}</td>
                                 <td>R$00,00</td>
                                 <td>
-                                    <a href="{{ route('imprimirBoleto', [$boleto->id]) }}">
+                                    <a target="_blank" href="{{ route('imprimirBoleto', [$boleto->id]) }}">
                                         <img src="{{ asset('assets/boleto.png') }}" class="imgBoleto" alt="">
                                     </a>
                                 </td>
@@ -148,7 +158,7 @@
                                 <td>R${{ formatNumber($boleto->reg_valor) }}</td>
                                 <td>R$00,00</td>
                                 <td>
-                                    <a href="{{ route('imprimirBoleto', [$boleto->id]) }}"
+                                    <a target="_blank" href="{{ route('imprimirBoleto', [$boleto->id]) }}"
                                         class="" id=""><img src="{{ asset('assets/boleto.png') }}" class="imgBoleto" alt=""></a>
                                 </td>
 

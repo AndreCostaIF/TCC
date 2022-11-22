@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
+include('openboleto/autoloader.php');
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-
+use openBoleto\Banco\Santander;
 class TradutorRemessa extends Controller
 {
 
@@ -86,18 +85,20 @@ class TradutorRemessa extends Controller
         $remessaSantader = fopen($nameArq, 'w');
         fwrite($remessaSantader, $header . "\n");
         $valorTotalTitulos = 0;
-
+        $santoandre = new Santander();
         //Registro movimento
         for ($i = 1; $i < (sizeof($remessaBradesco) - 1); $i++) {
-
             $x = $remessaBradesco[$i];
+            //dd(substr($x, 75, 6));
+            $santoandre->setSequencial(substr($x, 73, 8));
+
 
             $codigoRegistro = substr($x, 0, 1); //001 - 001 (001)
-            $tipoBeneficiario = "02"; // 002 - 003 (002)
+            $tipoBeneficiario = "02"; // 002 - 003 (002
             $cnpjOuCpf = "07692425000158"; // 004 - 017 (014)
             $codTransmissao = "45430981859601300398"; // 018 - 037 (020)
-            $controleParticipante = "0000000000000000000000" . $i + 100; // 038 - 062 (025)
-            $nossoNumero = "00000000"; // 063 - 070 (008)
+            $controleParticipante = substr($x, 37, 25); // 038 - 062 (025)
+            $nossoNumero = completarPosicoes( substr($x, 75, 6).$santoandre->gerarDigitoVerificadorNossoNumero(), 8, '0'); // 063 - 070 (008)
             $dataSegundoDesc = "000000"; // 071 - 076 (006)
             $branco1espaco = str_pad("", 1, " "); // 077 - 077 (001)
             $infoMulta = "4"; // 078 - 078 (001)

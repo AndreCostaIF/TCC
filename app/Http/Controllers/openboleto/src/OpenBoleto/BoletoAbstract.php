@@ -226,7 +226,7 @@ abstract class BoletoAbstract
      * @var Agente
      */
     protected $cedente;
-    
+
     /**
      * Entidade sacada (de quem se cobra o boleto)
      * @var Agente
@@ -280,7 +280,7 @@ abstract class BoletoAbstract
      * @var string
      */
     protected $logoBanco;
-    
+
     /**
     * Array que sera exportada pelo metodo getData
     * @var array
@@ -292,8 +292,8 @@ abstract class BoletoAbstract
      * @var array
      */
     protected $imprimeInstrucoesImpressao = true;
-    
-    
+
+
     /**
      * Construtor
      *
@@ -609,7 +609,7 @@ abstract class BoletoAbstract
         $this->numeroDocumento = $numeroDocumento;
         return $this;
     }
-    
+
     /**
      * Define o Número da parcela
      *
@@ -1074,7 +1074,7 @@ abstract class BoletoAbstract
     {
         return $this->resourcePath;
     }
-    
+
     /**
      * Define se imprime ou não as instruções de impressão
      *
@@ -1086,7 +1086,7 @@ abstract class BoletoAbstract
         $this->imprimeInstrucoesImpressao = $imprimeInstrucoesImpressao;
         return $this;
     }
-    
+
     /**
      * Retorna se imprime ou não as instruções de impressão
      *
@@ -1282,11 +1282,11 @@ abstract class BoletoAbstract
             'numero_febraban' => $this->getNumeroFebraban(),
             'imprime_instrucoes_impressao' => $this->getImprimeInstrucoesImpressao()
         );
-        
-        
-        
+
+
+
         $this->data = array_merge($this->data,$this->getViewVars());
-        
+
         extract($this->data);
 
         // Ignore errors inside the template
@@ -1468,7 +1468,7 @@ abstract class BoletoAbstract
         '<div class="black thin"></div>' .
         '</div>';
     }
-    
+
     /**
     * Retorna os dados do boleto em um array para ser usado externamente
     *
@@ -1478,9 +1478,9 @@ abstract class BoletoAbstract
     {
         if(empty($this->data))
         {
-            $this->getOutput();  
-        }  
-        return $this->data;               
+            $this->getOutput();
+        }
+        return $this->data;
     }
 
     /**

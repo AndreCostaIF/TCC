@@ -13,7 +13,6 @@
 <link rel="stylesheet" href="{{ url('css/style.css') }}">
 
 <body>
-
     <div class="container ">
         <div class="loginHeader mt-5">
             <img src="{{ asset('assets/logo.svg') }}" class="col-6" alt="">

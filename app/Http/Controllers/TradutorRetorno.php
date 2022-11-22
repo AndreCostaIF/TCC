@@ -82,7 +82,7 @@ class TradutorRetorno extends Controller
         $zeros . $numAviso . $branco266 . $dataCredito . $branco9 . $numSequencialHeader;
 
         //NOME DO ARQUIVO
-        $nomeArq = 'CB' . date('dmy').date("hi").'.REM';
+        $nomeArq = 'CB' . date('dmy').'.RET';
 
         $retornoBradesco = fopen($nomeArq, 'w');
         //ESCREVE NO ARQUIVO

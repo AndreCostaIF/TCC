@@ -11,8 +11,7 @@ class LoginContoller extends Controller
 {
     public function index($erro = null)
     {
-            return view('login');
-
+        return view('login');
     }
 
 

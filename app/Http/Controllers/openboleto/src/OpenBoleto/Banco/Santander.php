@@ -135,7 +135,7 @@ class Santander extends BoletoAbstract
         return $sequencial . '-' . $this->gerarDigitoVerificadorNossoNumero();
     }
 
-    protected function gerarDigitoVerificadorNossoNumero() {
+    public function gerarDigitoVerificadorNossoNumero() {
         $sequencial = self::zeroFill($this->getSequencial(), 12);
         $digitoVerificador = static::modulo11($sequencial);
 

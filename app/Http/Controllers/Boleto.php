@@ -122,6 +122,9 @@ class Boleto extends Controller
                     $id
                 )->get(), true);
 
+                if($cliente == []){
+                    return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
+                }
                 $cliente = $cliente[0];
 
                 $pessoaFisica['idCliente'] = $cliente['id'];
@@ -153,6 +156,10 @@ class Boleto extends Controller
                     'pessoa_juridica_id',
                     $pessoaJuridica['id']
                 )->get(), true);
+
+                if($cliente == []){
+                    return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
+                }
 
                 $cliente = $cliente[0];
 
@@ -189,6 +196,9 @@ class Boleto extends Controller
             $boleto[0]['cliente_id_web']
         )->get(), true);
         $boleto = $boleto[0];
+        if($cliente == []){
+            return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
+        }
         $cliente = $cliente[0];
 
         if(isset($cliente['pessoa_fisica_id'])){
@@ -230,6 +240,7 @@ class Boleto extends Controller
                 'carteira' => 101,
                 'conta' => 1300398, // Até 8 dígitos
                 'convenio' => 9818596, // 4, 6 ou 7 dígitos
+                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web']."", 10, "0")
             ));
 
             $msg = str_replace("\n","<br>", $boleto['descricao']);
@@ -280,6 +291,7 @@ class Boleto extends Controller
                 'carteira' => 101,
                 'conta' => 1300398, // Até 8 dígitos
                 'convenio' => 9818596, // 4, 6 ou 7 dígitos
+                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web']."", 10, "0")
             ));
 
             $msg = str_replace("\n","<br>", $boleto['descricao']);

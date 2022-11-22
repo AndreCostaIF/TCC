@@ -5,7 +5,6 @@ $('#flag').on('change', function() {
 
 
 
-
     if ( $( ".idBoleto" ).length ) {
 
         if ( $( ".imprimirTodos" ).length ) {
@@ -18,5 +17,4 @@ $('#flag').on('change', function() {
             console.log($( ".idBoleto" ));
         }
     }
-
 
