@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 include('openboleto/autoloader.php');
 use Illuminate\Http\Request;
-use openBoleto\Banco\Santander;
+use OpenBoleto\Banco\Santander;
 class TradutorRemessa extends Controller
 {
 

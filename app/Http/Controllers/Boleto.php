@@ -6,14 +6,14 @@ namespace App\Http\Controllers;
 include('openboleto/autoloader.php');
 
 use App\Models\Pessoa_fisica;
-use openBoleto\Agente;
-use openBoleto\Banco\Santander;
+use OpenBoleto\Agente;
+use OpenBoleto\Banco\Santander;
 use App\Models\Clientes;
 use App\Models\Financeiros;
 use App\Models\PessoaJuridica;
 use Illuminate\Support\Facades\DB;
 use DateTime;
-use OpenBoleto\BoletoAbstract;
+
 
 use Illuminate\Http\Request;
 
