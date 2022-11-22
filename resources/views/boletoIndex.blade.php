@@ -1,5 +1,9 @@
 @include('masterhead')
 
+<div class="row">
+    <span class="title h2 text-center">Buscar boletos por cliente</span>
+</div>
+
 <div class="">
     <h3 class="subtitle">buscar boletos</h3>
 </div>

@@ -1,27 +1,33 @@
 @include('masterhead')
 
-<div class="">
-    <h3 class="subtitle">buscar boletos</h3>
+<div class="row">
+    <span class="title h2 text-center">Imprimir boletos em massa</span>
 </div>
 
-<div class="col-md-3 mt-3">
-    <form action="{{ route('massa') }}" method="GET" class="d-flex justify-content-between align-items-center">
-        @csrf
+<div class="mt-5 text-center">
+    <h3 class="subtitle">buscar boletos</h3>
+</div>
+<div class="d-flex justify-content-center ">
+
+    <div class="col-md-5  mt-3">
+        <form action="{{ route('massa') }}" method="GET" class="d-flex justify-content-around align-items-center">
+            @csrf
 
 
-        <div class="form-floating col-md-6">
-            <input type="date" class="form-control" name="data" id="floatingInput" placeholder="name@example.com"
-                required>
-            <label for="floatingInput" id="campoBusca">Informe a data</label>
-        </div>
+            <div class="form-floating col-md-6">
+                <input type="date" class="form-control" name="data" id="floatingInput" placeholder="name@example.com"
+                    required>
+                <label for="floatingInput" id="campoBusca">Informe a data</label>
+            </div>
 
-        <div class="">
+            <div class="">
 
-            <button type="submit" class="btn btn-outline-danger" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
-        </div>
+                <button type="submit" class="btn btn-outline-danger" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
+            </div>
 
 
-    </form>
+        </form>
+    </div>
 </div>
 <div class="mt-3 ">
 
@@ -77,7 +83,7 @@
                 <div class="alert alert-danger " role="alert">
 
                     <div>
-                        <i class="bi bi-exclamation-triangle-fill"></i> Nenhum boleto encontrado!
+                        <i class="bi bi-exclamation-triangle-fill"></i><b>Nenhum boleto encontrado!</b> Por favor, selecione outra data.
                     </div>
                 </div>
             </div>
