@@ -17,7 +17,7 @@
 
         <div class="">
 
-            <button type="submit" class="btn botaoForm" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
+            <button type="submit" class="btn btn-outline-danger" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
         </div>
 
 
@@ -40,7 +40,7 @@
                 <form action="{{ route('imprimirMassa') }}" method="POST">
                     @csrf
                     <input type="hidden" name="imprimirTodos" class="imprimirTodos" value="">
-                    <button type="submit" class="btn botaoForm " id="botaoForm"><i class="bi bi-printer"></i> Imprimir
+                    <button type="submit" class="btn btn-outline-danger " id="botaoForm"><i class="bi bi-printer"></i> Imprimir
                         todos</button>
                 </form>
             @endif

@@ -4,8 +4,6 @@
     <h3 class="subtitle">buscar boletos</h3>
 </div>
 
-
-
 <div class="col-md-6 mt-3 ">
     <form action="{{ route('buscarCliente') }}" method="GET" class="d-flex justify-content-between align-items-center">
         @csrf
@@ -28,7 +26,7 @@
 
         <div class="">
 
-            <button type="submit" class="btn botaoForm" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
+            <button type="submit" class="btn btn-outline-danger" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
         </div>
 
 
@@ -64,7 +62,7 @@
                         @endif
                         <td>
                             <a href="{{ route('listarBoletos', [$cliente->id, $flag]) }}"
-                                class="btn botaoForm bg-success text-white border-success" id="botaoForm">
+                                class="btn btn-success text-white border-success" id="botaoForm">
                                 <i class="bi bi-receipt-cutoff"></i> Ver boletos
                             </a>
                         </td>

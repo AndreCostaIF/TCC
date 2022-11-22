@@ -23,7 +23,7 @@
             </div>
             <div class="modal-footer">
 
-                <button type="submit" class="btn botaoForm" id="botaoForm">Importar</button>
+                <button type="submit" class="btn btn-outline-danger" id="botaoForm">Importar</button>
             </div>
         </form>
 
