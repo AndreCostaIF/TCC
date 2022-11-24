@@ -2,7 +2,8 @@
 
 
 <div class="text-center mt-5">
-    <h3 class="title text-danger">Converter remessa <b>BRADESCO</b> <i class="bi bi-arrow-right"></i> <b>santander</b></h3>
+    <h3 class="title text-danger">Converter remessa <b>BRADESCO</b> <i class="bi bi-arrow-right"></i> <b>santander</b>
+    </h3>
 </div>
 
 <div class="d-flex mt-5 justify-content-center w-100">
@@ -11,7 +12,7 @@
             <h6 class="title text-danger">Envie uma remessa do <u>BRADESCO</u></h6>
         </div>
 
-        <form method="POST" action="{{route('traduzirRemessa')}}" method="POST" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('traduzirRemessa') }}" method="POST" enctype="multipart/form-data">
             <div id="hiddens">
                 @csrf
             </div>
@@ -38,23 +39,58 @@
         </form> --}}
     </div>
 </div>
-@if(isset($remessaSantander))
+@if (isset($remessaSantander))
+    <div class="d-flex justify-content-center mt-3">
+        <div class="alert alert-success w-30" role="alert">
+            Arquivo traduzido com sucesso!
+        </div>
+    </div>
 
-<div class="d-flex justify-content-center mt-3">
-    <div class="alert alert-success w-30" role="alert">
-        Arquivo traduzido com sucesso!
-      </div>
-</div>
+    <div class="text-center border-top mt-3 border-bottom">
+        <h6 class="title text-danger">Dados da conversão</h6>
+        <p>Gerado em {{ $dataGerado }} às {{ $horaGerado }}</p>
+    </div>
 
-<div class="text-center border-top mt-3 border-bottom">
-    <h6 class="title text-danger">Dados da conversão</h6>
-    <p>Gerado em {{$dataGerado}} às {{$horaGerado}}</p>
-</div>
-
-<div class="text-center mt-3">
-    <a class="" href="{{$remessaSantander}}" download>Clique aqui para download! <i class="bi bi-download"></i></a>
-</div>
-
+    <div class="text-center mt-3">
+        <a class="" href="{{ $remessaSantander }}" download>Clique aqui para download! <i
+                class="bi bi-download"></i></a>
+    </div>
 @endif
+
+<div class="mt-5 row">
+    <div class="text-center">
+        <span class="text-danger h4 fw-bold">Historico de remessas</span>
+    </div>
+    <hr>
+    @if (isset($historico))
+        <div class="mt-3">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-danger">ID</th>
+                        <th scope="col" class="text-danger">Traduzido em</th>
+                        <th scope="col" class="text-danger">Usuário</th>
+                        <th scope="col" class="text-danger">Arquivo </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($historico as $item)
+                        <tr>
+                            <th scope="row">{{ $item->id }}</th>
+                            <td>{{ $item->dataTraducao }}</td>
+                            <td>{{ $item->autor }}</td>
+                            <td>
+                                <a class="" href="" download>
+                                    <i class="bi bi-download"></i>
+                                    {{ $item->nomeRemessa }}
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+</div>
 
 @include('footer')

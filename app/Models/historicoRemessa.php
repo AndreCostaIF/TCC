@@ -10,8 +10,9 @@ class historicoRemessa extends Model
 {
     use HasFactory;
 
-    public static function teste(){
-       $a = DB::connection('mysql2')->table('historico_remessa')->get();
+    public static function pegarTodos(){
+       $a = DB::connection('mysql2')->table('historico_remessa')->paginate(10);
     return $a;
     }
+
 }

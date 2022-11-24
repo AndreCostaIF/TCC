@@ -24,7 +24,9 @@ class TradutorRemessa extends Controller
         if($this->erroAutenticado()){
             return redirect()->route('index');
         }else{
-            dd(historicoRemessa::teste());
+            if(historicoRemessa::pegarTodos() != []){
+                $remessa['historico'] = historicoRemessa::pegarTodos();
+            }
             if($request->get('remessaSantander')){
                 $remessa['remessaSantander'] = $request->get('remessaSantander');
                 $remessa['dataGerado'] = $request->get('dataGerado');
