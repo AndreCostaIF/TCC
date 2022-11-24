@@ -11,9 +11,9 @@ class historicoRemessa extends Model
     use HasFactory;
 
     protected $connection = 'mysql2';
-
+    protected $table = 'historico_remessa';
     public static function pegarTodos(){
-       $a = DB::table('historico_remessa')->paginate(10);
+       $a = DB::connection('mysql2')->table('historico_remessa')->oderBy('dataTraducao', 'desc')->paginate(10);
     return $a;
     }
 

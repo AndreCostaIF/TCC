@@ -59,7 +59,8 @@
 
 <div class="mt-5 row">
     <div class="text-center">
-        <span class="text-danger h4 fw-bold">Historico de remessas</span>
+       <span class="fw-bold h4">Historico de remessas</span>
+       <span class="text-danger h4 fw-bold">Santander</span>
     </div>
     <hr>
     @if (isset($historico))
@@ -77,7 +78,7 @@
                     @foreach ($historico as $item)
                         <tr>
                             <th scope="row">{{ $item->id }}</th>
-                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:s')  }}</td>
+                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:i')  }}</td>
                             <td>{{ $item->autor }}</td>
                             <td>
                                 <a class="" href="{{ asset($item->nomeRemessa) }}" download>
