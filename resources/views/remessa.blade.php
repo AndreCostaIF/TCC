@@ -74,7 +74,11 @@
                         <th scope="col" class="text-danger">Arquivo </th>
                     </tr>
                 </thead>
+                <div class=" d-flex justify-content-center">
+                    {{ $historico->links() }}
+                </div>
                 <tbody>
+
                     @foreach ($historico as $item)
                         <tr>
                             <th scope="row">{{ $item->id }}</th>

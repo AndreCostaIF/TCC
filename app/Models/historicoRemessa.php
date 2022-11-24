@@ -13,7 +13,7 @@ class historicoRemessa extends Model
     protected $connection = 'mysql2';
     protected $table = 'historico_remessa';
     public static function pegarTodos(){
-       $a = DB::connection('mysql2')->table('historico_remessa')->oderBy('dataTraducao', 'desc')->paginate(10);
+       $a = DB::connection('mysql2')->table('historico_remessa')->orderBy('dataTraducao', 'desc')->paginate(10);
     return $a;
     }
 
