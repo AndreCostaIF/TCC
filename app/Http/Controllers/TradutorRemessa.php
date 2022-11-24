@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 include('openboleto/autoloader.php');
+
+use App\Models\historicoRemessa;
 use Illuminate\Http\Request;
 use OpenBoleto\Banco\Santander;
 class TradutorRemessa extends Controller
@@ -22,6 +24,7 @@ class TradutorRemessa extends Controller
         if($this->erroAutenticado()){
             return redirect()->route('index');
         }else{
+            dd(historicoRemessa::teste());
             if($request->get('remessaSantander')){
                 $remessa['remessaSantander'] = $request->get('remessaSantander');
                 $remessa['dataGerado'] = $request->get('dataGerado');
