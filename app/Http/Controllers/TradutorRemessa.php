@@ -254,7 +254,16 @@ class TradutorRemessa extends Controller
         //dd($remessaSantader);
         $remessa['remessaSantander'] = asset($nameArq);
         $remessa['dataGerado'] = date('d/m/y');
-        $remessa['horaGerado'] = date('h:i:sa');
+        $remessa['horaGerado'] = date('H:i:sa');
+        $historicoRemessa = new historicoRemessa();
+
+        $historicoRemessa->dataTraducao = date('y-m-d H:i');
+        $historicoRemessa->autor = session()->get('nome');
+        $historicoRemessa->nomeRemessa =  $nameArq;
+        $historicoRemessa->save();
+
+        $remessa['historico'] = $historicoRemessa;
+
         return redirect()->route('remessa', $remessa);
 
     }

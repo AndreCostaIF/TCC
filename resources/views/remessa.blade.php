@@ -77,7 +77,7 @@
                     @foreach ($historico as $item)
                         <tr>
                             <th scope="row">{{ $item->id }}</th>
-                            <td>{{ $item->dataTraducao }}</td>
+                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:s')  }}</td>
                             <td>{{ $item->autor }}</td>
                             <td>
                                 <a class="" href="" download>
