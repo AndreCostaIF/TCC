@@ -40,21 +40,17 @@
     </div>
 </div>
 @if (isset($remessaSantander))
-    <div class="d-flex justify-content-center mt-3">
-        <div class="alert alert-success w-30" role="alert">
-            Arquivo traduzido com sucesso!
-        </div>
-    </div>
-
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>Arquivo traduzido com sucesso!</strong>
     <div class="text-center border-top mt-3 border-bottom">
         <h6 class="title text-danger">Dados da conversão</h6>
         <p>Gerado em {{ $dataGerado }} às {{ $horaGerado }}</p>
     </div>
-
-    <div class="text-center mt-3">
-        <a class="" href="{{ $remessaSantander }}" download>Clique aqui para download! <i
-                class="bi bi-download"></i></a>
-    </div>
+    <a class="" href="{{ $remessaSantander }}" download>Clique aqui para download! <i
+        class="bi bi-download"></i>
+    </a>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
 @endif
 
 <div class="mt-5 row">
@@ -65,7 +61,7 @@
     <hr>
     @if (isset($historico))
         <div class="mt-3">
-            <table class="table table-hover">
+            <table class="table table-striped table-hover">
                 <thead>
                     <tr>
                         <th scope="col" class="text-danger">ID</th>

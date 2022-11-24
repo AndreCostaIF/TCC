@@ -1,50 +1,47 @@
 <?php
 
 namespace App\Http\Controllers;
+
 include('openboleto/autoloader.php');
 
 use App\Models\historicoRemessa;
 use Illuminate\Http\Request;
 use OpenBoleto\Banco\Santander;
+
 class TradutorRemessa extends Controller
 {
 
-    public function erroAutenticado(){
-        if(session()->has('nome')){
+    public function erroAutenticado()
+    {
+        if (session()->has('nome')) {
 
             return false;
-        }else{
+        } else {
             return true;
-
         }
     }
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
 
-        if($this->erroAutenticado()){
+        if ($this->erroAutenticado()) {
             return redirect()->route('index');
-        }else{
-            if(historicoRemessa::pegarTodos() != []){
+        } else {
+            if ($request->get('remessaSantander')) {
                 $remessa['historico'] = historicoRemessa::pegarTodos();
-                return view('remessa', $remessa);
-            }
-            if($request->get('remessaSantander')){
                 $remessa['remessaSantander'] = $request->get('remessaSantander');
                 $remessa['dataGerado'] = $request->get('dataGerado');
                 $remessa['horaGerado'] = $request->get('horaGerado');
                 return view('remessa', $remessa);
-            }else{
-              return view('remessa');
+            } else {
+                $remessa['historico'] = historicoRemessa::pegarTodos();
+                return view('remessa', $remessa);
             }
         }
-
-
-
-
     }
     function traduzir(Request $request)
     {
-        if($this->erroAutenticado()){
+        if ($this->erroAutenticado()) {
             return redirect()->route('index');
         }
 
@@ -87,7 +84,8 @@ class TradutorRemessa extends Controller
 
         //NOME DO ARQUIVO
 
-        $nameArq =  date('dmy').date("hi").'.REM';
+        $nameArq =  date('dmy') . date("hi") . '.REM';
+
         $remessaSantader = fopen($nameArq, 'w');
         fwrite($remessaSantader, $header . "\n");
         $valorTotalTitulos = 0;
@@ -104,7 +102,7 @@ class TradutorRemessa extends Controller
             $cnpjOuCpf = "07692425000158"; // 004 - 017 (014)
             $codTransmissao = "45430981859601300398"; // 018 - 037 (020)
             $controleParticipante = substr($x, 37, 25); // 038 - 062 (025)
-            $nossoNumero = completarPosicoes( substr($x, 75, 6).$santoandre->gerarDigitoVerificadorNossoNumero(), 8, '0'); // 063 - 070 (008)
+            $nossoNumero = completarPosicoes(substr($x, 75, 6) . $santoandre->gerarDigitoVerificadorNossoNumero(), 8, '0'); // 063 - 070 (008)
             $dataSegundoDesc = "000000"; // 071 - 076 (006)
             $branco1espaco = str_pad("", 1, " "); // 077 - 077 (001)
             $infoMulta = "4"; // 078 - 078 (001)
@@ -265,6 +263,5 @@ class TradutorRemessa extends Controller
         $remessa['historico'] = $historicoRemessa;
 
         return redirect()->route('remessa', $remessa);
-
     }
 }

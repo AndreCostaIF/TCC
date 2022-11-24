@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\historicoRetorno;
 use Illuminate\Http\Request;
 
 class TradutorRetorno extends Controller
@@ -38,11 +39,13 @@ class TradutorRetorno extends Controller
         //dd($request->get('retornoBradesco'));
 
         if($request->get('retornoBradesco')){
+            $remessa['historico'] = historicoRetorno::pegarTodos();
             $retorno['retornoBradesco'] = $request->get('retornoBradesco');
             $retorno['dataGerado'] = $request->get('dataGerado');
             $retorno['horaGerado'] = $request->get('horaGerado');
             return view('retorno', $retorno);
         }else{
+            $remessa['historico'] = historicoRetorno::pegarTodos();
           return view('retorno');
         }
     }
@@ -60,6 +63,7 @@ class TradutorRetorno extends Controller
         $name = $request->file('arq')->store('public/retorno');
         //TROCA O PUBLIC POR STORAGE NA URL
         $name = str_replace('public', 'storage', $name);
+
 
         //INICIO HEADER
         $retornoSantander = file($name);
@@ -261,6 +265,15 @@ class TradutorRetorno extends Controller
         $retorno['retornoBradesco'] = asset($nomeArq);
         $retorno['dataGerado'] = date('d/m/y');
         $retorno['horaGerado'] = date('h:i:sa');
+
+        $historicoRetorno = new historicoRetorno();
+
+        $historicoRetorno->dataTraducao = date('y-m-d H:i');
+        $historicoRetorno->autor = session()->get('nome');
+        $historicoRetorno->nomeRetorno =  $nomeArq;
+        $historicoRetorno->save();
+
+        $remessa['historico'] = $historicoRetorno;
         return redirect()->route('retorno', $retorno);
         //FIM TRAILER
     }

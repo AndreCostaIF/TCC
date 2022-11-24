@@ -58,4 +58,45 @@
 
 @endif
 
+<div class="mt-5 row">
+    <div class="text-center">
+       <span class="fw-bold h4">Historico de retornos</span>
+       <span class="text-danger h4 fw-bold">Bradesco</span>
+    </div>
+    <hr>
+    @if (isset($historico))
+        <div class="mt-3">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-danger">ID</th>
+                        <th scope="col" class="text-danger">Traduzido em</th>
+                        <th scope="col" class="text-danger">Usuário</th>
+                        <th scope="col" class="text-danger">Arquivo </th>
+                    </tr>
+                </thead>
+                <div class=" d-flex justify-content-center">
+                    {{ $historico->links() }}
+                </div>
+                <tbody>
+
+                    @foreach ($historico as $item)
+                        <tr>
+                            <th scope="row">{{ $item->id }}</th>
+                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:i')  }}</td>
+                            <td>{{ $item->autor }}</td>
+                            <td>
+                                <a class="" href="{{ asset($item->nomeRetorno) }}" download>
+                                    <i class="bi bi-download"></i>
+                                    {{ $item->nomeRetorno }}
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+</div>
+
 @include('footer')
