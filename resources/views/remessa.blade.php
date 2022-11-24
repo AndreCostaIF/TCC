@@ -80,7 +80,7 @@
                             <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:s')  }}</td>
                             <td>{{ $item->autor }}</td>
                             <td>
-                                <a class="" href="" download>
+                                <a class="" href="{{ asset($item->nomeRemessa) }}" download>
                                     <i class="bi bi-download"></i>
                                     {{ $item->nomeRemessa }}
                                 </a>
