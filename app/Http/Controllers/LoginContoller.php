@@ -42,6 +42,9 @@ class LoginContoller extends Controller
 
                 if(Session::get('nome')){
                     //return view('remessa');
+                    if(Session::get('grupo_users_id') != 1){
+                        return redirect()->route('buscarBoleto');
+                    }
                     return redirect()->route('remessa');
                 }else{
                     return redirect()->route('index');

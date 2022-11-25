@@ -39,7 +39,7 @@
                     {{ $boletos->links() }}
                 </div>
                 @if ($boletos->total() > 0)
-                    <form action="{{ route('imprimirMassa') }}" method="POST">
+                    <form action="{{ route('imprimirMassa') }}" method="POST" target="_blank">
                         @csrf
                         <input type="hidden" name="imprimirTodos" class="imprimirTodos" value="">
                         <button type="submit" class="btn btn-outline-danger " id="botaoForm">

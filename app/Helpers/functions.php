@@ -2,6 +2,7 @@
 
     function formatDateAndTime($value, $format = 'd/m/Y')
     {
+        $value = str_replace('pm', '', $value);
         // Utiliza a classe de Carbon para converter ao formato de data ou hora desejado
         return Carbon\Carbon::parse($value)->format($format);
     }
@@ -66,4 +67,5 @@
 
         return $campo;
     }
+
 ?>

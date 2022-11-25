@@ -38,22 +38,16 @@
     </div>
 </div>
 @if(isset($retornoBradesco))
-
-<div class="d-flex justify-content-center mt-3">
-    <div class="alert alert-success w-30" role="alert">
-        Arquivo traduzido com sucesso!
-      </div>
-
-</div>
-
-<div class="text-center border-top mt-3 border-bottom">
-    <h6 class="title text-danger">Dados da conversão</h6>
-    <p>Gerado em {{$dataGerado}} às {{$horaGerado}}</p>
-</div>
-
-<div class="text-center mt-3">
-
-    <a class="" href="{{$retornoBradesco}}" download>Clique aqui para baixar! <i class="bi bi-download"></i></a>
+<div class="alert alert-success text-center mt-5 alert-dismissible fade show" role="alert">
+    <strong>Arquivo traduzido com sucesso!</strong>
+    <div class="text-center border-top mt-3 border-bottom">
+        <h6 class="title text-danger">Dados da conversão</h6>
+        <p>Gerado em {{ $dataGerado }} às {{ $horaGerado }}</p>
+    </div>
+    <a class="" href="{{ 'retornoBradesco' }}" download>Clique aqui para download! <i
+        class="bi bi-download"></i>
+    </a>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
 @endif

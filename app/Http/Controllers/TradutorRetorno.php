@@ -39,13 +39,13 @@ class TradutorRetorno extends Controller
         //dd($request->get('retornoBradesco'));
 
         if($request->get('retornoBradesco')){
-            $remessa['historico'] = historicoRetorno::pegarTodos();
+            $retorno['historico'] = historicoRetorno::pegarTodos();
             $retorno['retornoBradesco'] = $request->get('retornoBradesco');
             $retorno['dataGerado'] = $request->get('dataGerado');
             $retorno['horaGerado'] = $request->get('horaGerado');
             return view('retorno', $retorno);
         }else{
-            $remessa['historico'] = historicoRetorno::pegarTodos();
+            $retorno['historico'] = historicoRetorno::pegarTodos();
           return view('retorno');
         }
     }
@@ -272,8 +272,7 @@ class TradutorRetorno extends Controller
         $historicoRetorno->autor = session()->get('nome');
         $historicoRetorno->nomeRetorno =  $nomeArq;
         $historicoRetorno->save();
-
-        $remessa['historico'] = $historicoRetorno;
+        $retorno['historico'] = $historicoRetorno;
         return redirect()->route('retorno', $retorno);
         //FIM TRAILER
     }
