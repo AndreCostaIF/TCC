@@ -141,6 +141,31 @@
                                 <td>R${{ formatNumber($boleto->reg_valor) }}</td>
                                 <td>R$00,00</td>
                                 <td><i class="bi bi-three-dots-vertical"></i></td>
+                                <td class="">
+                                    <div class="dropdown">
+                                        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="bi h4 bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                                    data-bs-target="#exampleModal">
+                                                    <i class="bi bi-currency-dollar text-success"></i> Dar baixa
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item" type="button">
+                                                    <i class="bi bi-pencil-square text-primary"></i> Editar boleto
+                                                </button>
+                                            </li>
+                                            <li><button class="dropdown-item" type="button">
+                                                    <i class="bi bi-info-circle text-info"></i> Mais informações
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
                                 <td>
                                     <a target="_blank" href="{{ route('imprimirBoleto', [$boleto->id]) }}">
                                         <img src="{{ asset('assets/boleto.png') }}" class="imgBoleto" alt="">
