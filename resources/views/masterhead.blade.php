@@ -22,27 +22,26 @@
         <nav class="navbar navbar-expand-lg navbar-light justify-content-between">
             <div class="collapse navbar-collapse menu-list">
                 <ul class="navbar-nav">
-                    @if (isset(session()->get('grupo_users_id')))
-                        @if (session()->get('grupo_users_id') == 1)
-                            <li class="nav-item">
-                                <a class="nav-link " href="{{ route('remessa') }}"><i
-                                        class="bi bi-file-earmark-arrow-up"></i> Remessa </a>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('retorno') }}"><i
-                                        class="bi bi-file-earmark-arrow-down"></i> Retorno</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('massaView') }}"><i
-                                        class="bi bi-receipt-cutoff"></i>Boletos em Massa </a>
-                            </li>
-                        @endif
+
+                    @if (session()->get('grupo_users_id') == 1)
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ route('remessa') }}"><i
+                                    class="bi bi-file-earmark-arrow-up"></i> Remessa </a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('retorno') }}"><i
+                                    class="bi bi-file-earmark-arrow-down"></i> Retorno</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('massaView') }}"><i
+                                    class="bi bi-receipt-cutoff"></i>Boletos em Massa </a>
+                        </li>
                     @endif
+
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('buscarBoleto') }}"><i class="bi bi-search"></i> buscar
-                            boleto</a>
+                            boleto
+                        </a>
                     </li>
-
-
                 </ul>
             </div>
 
@@ -52,16 +51,16 @@
                         <div class="dropdown">
                             <a class="nav-link">{{ session()->get('nome') }} <i class="bi bi-caret-down"></i></a>
                             <div class="dropdown-content">
-                                @if (isset(session()->get('grupo_users_id')))
-                                    @if (session()->get('grupo_users_id') == 1)
-                                        <a href="{{ route('remessa') }}"><i class="bi bi-file-earmark-arrow-up"></i>
-                                            Remessa
-                                        </a>
-                                        <a href="{{ route('retorno') }}"><i class="bi bi-file-earmark-arrow-down"></i>
-                                            Retorno
-                                        </a>
-                                    @endif
+
+                                @if (session()->get('grupo_users_id') == 1)
+                                    <a href="{{ route('remessa') }}"><i class="bi bi-file-earmark-arrow-up"></i>
+                                        Remessa
+                                    </a>
+                                    <a href="{{ route('retorno') }}"><i class="bi bi-file-earmark-arrow-down"></i>
+                                        Retorno
+                                    </a>
                                 @endif
+
                                 <a href="{{ route('logout') }}"><i class="bi bi-box-arrow-right text-danger"></i>
                                     Sair</a>
                             </div>

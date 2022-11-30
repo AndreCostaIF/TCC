@@ -40,7 +40,7 @@
     </div>
 </div>
 @if (isset($remessaSantander))
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
+<div class="alert alert-success text-center mt-5 alert-dismissible fade show" role="alert">
     <strong>Arquivo traduzido com sucesso!</strong>
     <div class="text-center border-top mt-3 border-bottom">
         <h6 class="title text-danger">Dados da conversão</h6>
@@ -78,7 +78,7 @@
                     @foreach ($historico as $item)
                         <tr>
                             <th scope="row">{{ $item->id }}</th>
-                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:i')  }}</td>
+                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:i:s')  }}</td>
                             <td>{{ $item->autor }}</td>
                             <td>
                                 <a class="" href="{{ asset($item->nomeRemessa) }}" download>

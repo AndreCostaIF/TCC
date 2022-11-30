@@ -1,5 +1,5 @@
 $('#flag').on('change', function() {
-    $('#campoBusca').val('teste')
+    $('#campoBusca').html($('#flag').val().toUpperCase())
   });
 
 

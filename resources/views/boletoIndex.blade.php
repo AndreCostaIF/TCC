@@ -12,7 +12,8 @@
     <form action="{{ route('buscarCliente') }}" method="GET" class="d-flex justify-content-between align-items-center">
         @csrf
         <div class="form-floating col-md-3">
-            <select class="form-select" id="flag" name="flag" aria-label="Floating label select example" required>
+            <select class="form-select" id="flag" name="flag" aria-label="Floating label select example"
+                required>
                 <option value="">Selecione</option>
                 <option value="cpf">CPF</option>
                 <option value="nome">Nome</option>
@@ -30,7 +31,8 @@
 
         <div class="">
 
-            <button type="submit" class="btn btn-outline-danger" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
+            <button type="submit" class="btn btn-outline-danger" id="botaoForm"><i class="bi bi-search"></i>
+                Buscar</button>
         </div>
 
 
@@ -38,11 +40,10 @@
 </div>
 
 @if (session()->has('erroCliente'))
-<div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-    <strong> {{session()->get('erroCliente')}}!</strong> Algo de inesperado aconteceu :(
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-
+    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        <strong> {{ session()->get('erroCliente') }}!</strong> Algo de inesperado aconteceu :(
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 @endif
 
 @if (isset($clientesBusca))
@@ -61,7 +62,7 @@
                             <th scope="row">{{ $cliente->nome }}</th>
                             <td>{{ formatarCpf($cliente->cpf) }}</td>
                         @elseif (isset($cliente->fantasia))
-                            <th scope="row">{{ $cliente->fantasia}} </th>
+                            <th scope="row">{{ $cliente->fantasia }} </th>
                             <td>{{ formatarCnpj($cliente->cnpj) }}</td>
                         @endif
                         <td>
@@ -84,7 +85,7 @@
 @if (isset($cliente))
     @if (isset($boletos))
 
-    <div class="mt-5">
+        <div class="mt-5">
             <table class="table  table-hover">
                 <thead>
                     <tr>
@@ -95,13 +96,13 @@
                         <th scope="col">Pagamento</th>
                         <th scope="col">Valor a pagar</th>
                         <th scope="col">Valor pago</th>
+                        <th scope="col">Opções</th>
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
 
-                    @foreach ( $boletos as $boleto )
-
+                    @foreach ($boletos as $boleto)
                         {{-- BOLETOS PAGOS --}}
 
                         @php
@@ -119,10 +120,12 @@
                                 <td>{{ formatDateAndTime($boleto->bx_pagamento) }}</td>
                                 <td>R${{ formatNumber($boleto->reg_valor) }}</td>
                                 <td>R${{ formatNumber($boleto->bx_valor_pago) }}</td>
+                                <td></td>
                                 <td>
                                     <button class="btn botaoForm bg-success text-white border-success" id="botaoForm"
                                         disabled><i class="bi bi-check2-circle"></i> Pago</button>
                                 </td>
+
 
                             </tr>
                         @endif
@@ -131,17 +134,19 @@
                                 <th scope="row"><a
                                         href="http://177.223.83.142/admin/clientes/visualizar/id/{{ $cliente['idCliente'] }}"
                                         target="_blank">{{ $cliente['nome'] }}</a> </th>
-                                <td >{{ $boleto->id }}</td>
+                                <td>{{ $boleto->id }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
                                 <td></td>
                                 <td>R${{ formatNumber($boleto->reg_valor) }}</td>
                                 <td>R$00,00</td>
+                                <td><i class="bi bi-three-dots-vertical"></i></td>
                                 <td>
                                     <a target="_blank" href="{{ route('imprimirBoleto', [$boleto->id]) }}">
                                         <img src="{{ asset('assets/boleto.png') }}" class="imgBoleto" alt="">
                                     </a>
                                 </td>
+
 
                             </tr>
                         @endif
@@ -159,18 +164,40 @@
                                 <td></td>
                                 <td>R${{ formatNumber($boleto->reg_valor) }}</td>
                                 <td>R$00,00</td>
+                                <td class="">
+                                    <div class="dropdown">
+                                        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="bi h4 bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                                    data-bs-target="#exampleModal">
+                                                    <i class="bi bi-currency-dollar text-success"></i> Dar baixa
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item" type="button">
+                                                    <i class="bi bi-pencil-square text-primary"></i> Editar boleto
+                                                </button>
+                                            </li>
+                                            <li><button class="dropdown-item" type="button">
+                                                    <i class="bi bi-info-circle text-info"></i> Mais informações
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
                                 <td>
                                     <a target="_blank" href="{{ route('imprimirBoleto', [$boleto->id]) }}"
-                                        class="" id=""><img src="{{ asset('assets/boleto.png') }}" class="imgBoleto" alt=""></a>
+                                        class="" id=""><img src="{{ asset('assets/boleto.png') }}"
+                                            class="imgBoleto" alt=""></a>
                                 </td>
 
                             </tr>
                         @endif
-
-
-
                         {{-- IF dataVencimento < dataAtual --}}
-
                         </tr>
                     @endforeach
 
@@ -179,6 +206,92 @@
         </div>
         <div class="mb-3 d-flex justify-content-center">
             {{ $boletos->links() }}
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i
+                                class="bi bi-currency-dollar text-success"></i> Dar baixa</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Vencimento</label>
+                                <input type="date" class="form-control" id="exampleInputEmail1"
+                                    aria-describedby="emailHelp">
+                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Mês de referência</label>
+                                <select class="form-select" aria-label="Default select example">
+                                    <option selected>Open this select menu</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Ano de referência</label>
+                                <select class="form-select" aria-label="Default select example">
+                                    <option selected>Open this select menu</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Valor Principal (R$)</label>
+                                <input type="text" class="form-control" id="exampleInputEmail1"
+                                    aria-describedby="emailHelp">
+                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Tipo de baixa</label>
+                                <select class="form-select" aria-label="Default select example">
+                                    <option selected>Open this select menu</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Mensalidade</label>
+                                <select class="form-select" aria-label="Default select example">
+                                    <option selected>Open this select menu</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Valor pago</label>
+                                <input type="text" class="form-control" id="exampleInputEmail1"
+                                    aria-describedby="emailHelp">
+                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.
+                                </div>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
         </div>
     @else
     @endif

@@ -44,7 +44,7 @@
         <h6 class="title text-danger">Dados da conversão</h6>
         <p>Gerado em {{ $dataGerado }} às {{ $horaGerado }}</p>
     </div>
-    <a class="" href="{{ 'retornoBradesco' }}" download>Clique aqui para download! <i
+    <a class="" href="{{ $retornoBradesco }}" download>Clique aqui para download! <i
         class="bi bi-download"></i>
     </a>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -77,7 +77,7 @@
                     @foreach ($historico as $item)
                         <tr>
                             <th scope="row">{{ $item->id }}</th>
-                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:i')  }}</td>
+                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:i:s')  }}</td>
                             <td>{{ $item->autor }}</td>
                             <td>
                                 <a class="" href="{{ asset($item->nomeRetorno) }}" download>

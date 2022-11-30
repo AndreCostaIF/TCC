@@ -112,7 +112,7 @@ class TradutorRemessa extends Controller
             $branco4espaco = str_pad("", 4, " "); // 098 - 101 (004)
             $dataCobrancaMulta = "000000"; // 102 - 107 (006)
             $codigoCarteira = "5"; // 108 - 108 (001)
-            $codigoOcorrencia = "01"; // 109 - 110 (002)
+            $codigoOcorrencia = substr($x, 108, 2); // 109 - 110 (002)
             $seuNumero = substr($x, 110, 10); // 111 - 120 (010)
             $dataVencimento = substr($x, 120, 6); // 121 - 126 (006)
             $valorTitulo = substr($x, 126, 13); // 127 - 139 (013)
@@ -150,7 +150,7 @@ class TradutorRemessa extends Controller
 
             }
 
-            $bairro = str_pad("", 12, " ");; // 315 - 326 (014)
+            $bairro = str_pad("", 12, " "); // 315 - 326 (014)
             if (strlen($enderecoSacado) < 40) {
 
                 $completar = 40 - strlen($enderecoSacado);
@@ -255,7 +255,7 @@ class TradutorRemessa extends Controller
         $remessa['horaGerado'] = date('H:i:sa');
         $historicoRemessa = new historicoRemessa();
 
-        $historicoRemessa->dataTraducao = date('y-m-d H:i');
+        $historicoRemessa->dataTraducao = date('y-m-d H:i:s');
         $historicoRemessa->autor = session()->get('nome');
         $historicoRemessa->nomeRemessa =  $nameArq;
         $historicoRemessa->save();

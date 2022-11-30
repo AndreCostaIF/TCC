@@ -32,6 +32,21 @@ class TradutorRetorno extends Controller
         return $campo;
     }
 
+    private function completarPosicoes2($campo, $posicoes, $complemento)
+    {
+        //verifica se o valor total de É MAIOR QUE
+        if (strlen($campo) < $posicoes) {
+
+            $completar = $posicoes - strlen($campo);
+
+            $campo = $campo . str_pad("", $completar, $complemento);
+        } else if (strlen($campo) > $posicoes) {
+            $campo = substr($campo, 0, $posicoes);
+        }
+
+        return $campo;
+    }
+
     public function index(Request $request){
         if($this->erroAutenticado()){
             return redirect()->route('index');
@@ -46,7 +61,7 @@ class TradutorRetorno extends Controller
             return view('retorno', $retorno);
         }else{
             $retorno['historico'] = historicoRetorno::pegarTodos();
-          return view('retorno');
+          return view('retorno', $retorno);
         }
     }
 
@@ -73,7 +88,7 @@ class TradutorRetorno extends Controller
         $codigoEmpresa       = "00000000000007891680"; //027 - 046 (020)
         $nomeEmpresa         = substr($x, 46, 30); // 047 - 076 (030)
         $codigoBanco         = "237"; // 077 - 079 (003)
-        $nomeBanco           = $this->completarPosicoes('BRADESCO', 15, ' '); // 080 - 094 (015)
+        $nomeBanco           = $this->completarPosicoes2('BRADESCO', 15, ' '); // 080 - 094 (015)
         $dataGravacao        = substr($x, 94, 6); //095 - 100 (006)
         $zeros               = str_pad("", 8, "0"); // 101 - 108 (008)
         $numAviso            = str_pad("", 5, "0"); // 109 - 113 (005)
@@ -268,7 +283,7 @@ class TradutorRetorno extends Controller
 
         $historicoRetorno = new historicoRetorno();
 
-        $historicoRetorno->dataTraducao = date('y-m-d H:i');
+        $historicoRetorno->dataTraducao = date('y-m-d H:i:s');
         $historicoRetorno->autor = session()->get('nome');
         $historicoRetorno->nomeRetorno =  $nomeArq;
         $historicoRetorno->save();
