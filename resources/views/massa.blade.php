@@ -38,6 +38,10 @@
                 <div class=" d-flex justify-content-center">
                     {{ $boletos->links() }}
                 </div>
+                <div class=" d-flex justify-content-around">
+                    <span> Boletos nesta página: {{ $boletos->count() }}</span>
+                    <span> Total do lote: {{ $boletos->total() }}</span>
+                   </div>
                 @if ($boletos->total() > 0)
                     <form action="{{ route('imprimirMassa') }}" method="POST" target="_blank">
                         @csrf
@@ -54,7 +58,7 @@
                             <td class="idBoleto">{{ $boletos[$index]['id'] }}</td>
                             <td>{{ formatDateAndTime($boletos[$index]['reg_lancamento']) }}</td>
                             <td>{{ formatDateAndTime($boletos[$index]['reg_vencimento']) }}</td>
-                            <td>R${{ formatNumber($boletos[$index]['reg_valor']) }}</td>
+                            <td>R${{ formatNumber($boletos[$index]['reg_valor_total']) }}</td>
                         </tr>
                     @endfor
                 </tbody>

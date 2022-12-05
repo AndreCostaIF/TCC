@@ -8,6 +8,8 @@
     <h3 class="subtitle">buscar boletos</h3>
 </div>
 
+
+
 <div class="col-md-6 mt-3 ">
     <form action="{{ route('buscarCliente') }}" method="GET" class="d-flex justify-content-between align-items-center">
         @csrf
@@ -118,9 +120,32 @@
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->bx_pagamento) }}</td>
-                                <td>R${{ formatNumber($boleto->reg_valor) }}</td>
+                                <td>R${{ formatNumber($boleto->reg_valor_total) }}</td>
                                 <td>R${{ formatNumber($boleto->bx_valor_pago) }}</td>
-                                <td></td>
+                                <td class="">
+                                    <div class="dropdown">
+                                        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="bi h4 bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @php
+                                                $dado = [
+                                                    'desconto' => $boleto->desconto,
+                                                    'acrescimo' => $boleto->acrescimo,
+                                                ];
+                                                $dado = json_encode($dado);
+                                            @endphp
+                                            <li>
+                                                <button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                                    data-bs-target="#maisInfo"
+                                                    onclick="info({{$dado}})">
+                                                    <i class="bi bi-info-circle text-info"></i> Mais informações
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
                                 <td>
                                     <button class="btn botaoForm bg-success text-white border-success" id="botaoForm"
                                         disabled><i class="bi bi-check2-circle"></i> Pago</button>
@@ -138,9 +163,8 @@
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
                                 <td></td>
-                                <td>R${{ formatNumber($boleto->reg_valor) }}</td>
+                                <td>R${{ formatNumber($boleto->reg_valor_total) }}</td>
                                 <td>R$00,00</td>
-                                <td><i class="bi bi-three-dots-vertical"></i></td>
                                 <td class="">
                                     <div class="dropdown">
                                         <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
@@ -148,7 +172,7 @@
                                             <i class="bi h4 bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu">
-                                            <li>
+                                            {{-- <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
                                                     data-bs-target="#exampleModal">
                                                     <i class="bi bi-currency-dollar text-success"></i> Dar baixa
@@ -158,8 +182,19 @@
                                                 <button class="dropdown-item" type="button">
                                                     <i class="bi bi-pencil-square text-primary"></i> Editar boleto
                                                 </button>
-                                            </li>
-                                            <li><button class="dropdown-item" type="button">
+                                            </li> --}}
+
+                                            @php
+                                                $dado = [
+                                                    'desconto' => $boleto->desconto,
+                                                    'acrescimo' => $boleto->acrescimo,
+                                                ];
+                                                $dado = json_encode($dado);
+                                            @endphp
+                                            <li>
+                                                <button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                                    data-bs-target="#maisInfo"
+                                                    onclick="info({{$dado}})">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
@@ -187,7 +222,7 @@
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
                                 <td></td>
-                                <td>R${{ formatNumber($boleto->reg_valor) }}</td>
+                                <td>R${{ formatNumber($boleto->reg_valor_total) }}</td>
                                 <td>R$00,00</td>
                                 <td class="">
                                     <div class="dropdown">
@@ -196,9 +231,24 @@
                                             <i class="bi h4 bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu">
-                                            <li>
+                                            {{-- <li>
+
+                                                @php
+                                                    $dado = [
+                                                        'idBoleto' => $boleto->id,
+                                                        'vencimento' => $boleto->reg_vencimento,
+                                                        'valor' => formatNumber($boleto->reg_valor_total),
+                                                        'mes_ref' => $boleto->mes_referencia,
+                                                        'ano_ref' => $boleto->ano_referencia,
+                                                        'mensalidade' => $boleto->mensalidade,
+                                                        'tipo_baixa' => $boleto->reg_baixa,
+                                                        'valor_pago' => formatNumber($boleto->bx_valor_pago),
+                                                    ];
+                                                    $dado = json_encode($dado);
+                                                @endphp
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#exampleModal">
+                                                    data-bs-target="#exampleModal"
+                                                    onclick="darbaixa({{ $dado }})">
                                                     <i class="bi bi-currency-dollar text-success"></i> Dar baixa
                                                 </button>
                                             </li>
@@ -206,8 +256,9 @@
                                                 <button class="dropdown-item" type="button">
                                                     <i class="bi bi-pencil-square text-primary"></i> Editar boleto
                                                 </button>
-                                            </li>
-                                            <li><button class="dropdown-item" type="button">
+                                            </li> --}}
+                                            <li><button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                                    data-bs-target="#maisInfo">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
@@ -234,7 +285,7 @@
         </div>
 
 
-        <!-- Modal -->
+        <!-- Modal BAIXA-->
         <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog">
@@ -246,74 +297,163 @@
                             aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form action="{{ route('baixaBoleto') }}" method="POST" id="formDarBaixa">
+                            <div>
+                                @csrf
+                                <input type="hidden" class="form-control" name="idBoleto" id="idBoleto"
+                                    value="">
+                            </div>
+                            <div>
+                                @error('idBoleto')
+                                    {{ $message }}
+                                @enderror
+                            </div>
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Vencimento</label>
-                                <input type="date" class="form-control" id="exampleInputEmail1"
-                                    aria-describedby="emailHelp">
-                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.
+                                <input type="date" class="form-control" id="vencimento"
+                                    aria-describedby="emailHelp" name="vencimento">
+                                <div>
+                                    @error('vencimento')
+                                        {{ $message }}
+                                    @enderror
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Mês de referência</label>
-                                <select class="form-select" aria-label="Default select example">
-                                    <option selected>Open this select menu</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
-                                    <option value="3">Three</option>
+                                <select class="form-select" aria-label="Default select example" name="mes_referencia"
+                                    id="mes_Ref">
+                                    <option selected>Selecione</option>
+                                    <option value="01">Janeiro</option>
+                                    <option value="02">Fevereiro</option>
+                                    <option value="03">Março</option>
+                                    <option value="04">Abril</option>
+                                    <option value="05">Maio</option>
+                                    <option value="06">Junho</option>
+                                    <option value="07">Julho</option>
+                                    <option value="08">Agosto</option>
+                                    <option value="09">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
                                 </select>
+                                <div>
+                                    @error('mes_referencia')
+                                        {{ $message }}
+                                    @enderror
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Ano de referência</label>
-                                <select class="form-select" aria-label="Default select example">
+                                <select class="form-select" aria-label="Default select example" name="ano_referencia"
+                                    id="ano_ref">
                                     <option selected>Open this select menu</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
-                                    <option value="3">Three</option>
+                                    <option value="20{{ date('y') }}">20{{ date('y') }}</option>
+                                    <option value="20{{ date('y') - 1 }}">20{{ date('y') - 1 }}</option>
+                                    <option value="20{{ date('y') - 1 }}">20{{ date('y') - 2 }}</option>
                                 </select>
+                                <div>
+                                    @error('ano_referencia')
+                                        {{ $message }}
+                                    @enderror
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Valor Principal (R$)</label>
-                                <input type="text" class="form-control" id="exampleInputEmail1"
+                                <input type="text" class="form-control" name="reg_valor" id="valor"
                                     aria-describedby="emailHelp">
-                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.
+                                <div id="emailHelp" class="form-text">Valor do boleto em reais.
+                                </div>
+                                <div>
+                                    @error('reg_valor')
+                                        {{ $message }}
+                                    @enderror
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Tipo de baixa</label>
-                                <select class="form-select" aria-label="Default select example">
-                                    <option selected>Open this select menu</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
+                                <select class="form-select" aria-label="Default select example" name="tipo_bx"
+                                    id="tipo_bx">
+                                    <option selected>Selecione</option>
+                                    <option value="0">Em aberto</option>
+                                    <option value="2">Em mãos</option>
                                 </select>
+                                <div>
+                                    @error('tipo_bx')
+                                        {{ $message }}
+                                    @enderror
+                                </div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="exampleInputEmail1" class="form-label">Mensalidade</label>
-                                <select class="form-select" aria-label="Default select example">
+                                <label for="exampleInputEmail1" class="form-label">Mensalidade?</label>
+                                <select class="form-select" aria-label="Default select example" name="mensalidade"
+                                    id="mensalidade">
                                     <option selected>Open this select menu</option>
-                                    <option value="1">One</option>
-                                    <option value="2">Two</option>
+                                    <option value="1">Sim</option>
+                                    <option value="0">Não</option>
                                 </select>
+                                <div>
+                                    @error('mensalidade')
+                                        {{ $message }}
+                                    @enderror
+                                </div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Valor pago</label>
-                                <input type="text" class="form-control" id="exampleInputEmail1"
+                                <input type="text" class="form-control" name="valor_pago" id="valor_pago"
                                     aria-describedby="emailHelp">
-                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.
+                                <div id="emailHelp" class="form-text">Valor pago pelo cliente.
+                                </div>
+                                <div>
+                                    @error('valor_pago')
+                                        {{ $message }}
+                                    @enderror
                                 </div>
                             </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Submit</button>
+
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" type="submit" id="botaoDarBaixa" class="btn btn-primary">Dar
+                            baixa</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal MAIS INFORMAÇÕES-->
+        <div class="modal fade" id="maisInfo" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-info-circle text-info"></i> Informações</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                       <div class="">
+                        <div class="BoxDesconto mb-3" style="display: none">
+                            <div class="h5 text-primary text-center border-bottom">Descontos <i class="bi  bi-graph-down-arrow"></i></div>
+                            <div class="d-flex justify-content-between ">
+                                <span class="desconto fw-bold">Desconto:</span>
+                                <span class="descontoValor text-primary fw-bold"> R$10,00</span>
+                            </div>
+                        </div>
+
+                        <div class="BoxAcrescimo mb-3" style="display: none">
+                            <div class="h5 text-success text-center border-bottom">Acréscimos <i class="bi  bi-graph-up-arrow"></i></div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="acrescimo fw-bold">Acréscimo:</span>
+                                <span class="acrescimoValor text-success fw-bold"></span>
+                            </div>
+                        </div>
+                       </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
                 </div>
             </div>

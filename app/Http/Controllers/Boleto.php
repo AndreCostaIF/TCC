@@ -19,33 +19,33 @@ use Illuminate\Http\Request;
 
 class Boleto extends Controller
 {
-    public function erroAutenticado(){
-        if(session()->has('nome')){
+    public function erroAutenticado()
+    {
+        if (session()->has('nome')) {
 
             return false;
-        }else{
+        } else {
             return true;
-
         }
     }
     public function index($data = null)
     {
-        if($this->erroAutenticado()){
+        if ($this->erroAutenticado()) {
             return redirect()->route('index');
-        }else{
-            if($data != null){
+        } else {
+            if ($data != null) {
 
                 return view('boletoIndex', $data);
-            }else{
+            } else {
                 return view('boletoIndex');
             }
         }
-
     }
 
-    public function buscarCliente(Request $request){
+    public function buscarCliente(Request $request)
+    {
 
-        if($this->erroAutenticado()){
+        if ($this->erroAutenticado()) {
             return redirect()->route('index');
         }
         $search =  $request->get('campoBusca');
@@ -61,128 +61,148 @@ class Boleto extends Controller
                     ['nome', 'like', $search . '%']
                 ])->orderBy('nome', 'asc')->paginate(10);
 
-                $data['clientesBusca'] =  $pessoaFisica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
-
-            }else{
+                $data['clientesBusca'] =  $pessoaFisica->withPath("/boletos/clientes?flag=" . $flag . "&campoBusca=" . $search);
+            } else {
                 $search = somentoNumeroCpfOuCnpj($search);
                 $pessoaFisica =  Pessoa_fisica::where([
                     ['cpf', $search]
                 ])->orderBy('nome', 'asc')->paginate(10);
 
 
-                $data['clientesBusca'] = $pessoaFisica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
-
-            } $data['flag'] = 'cpf';
-        }elseif($flag == "fantasia" || $flag == "cnpj"){
-            if($flag == "fantasia"){
+                $data['clientesBusca'] = $pessoaFisica->withPath("/boletos/clientes?flag=" . $flag . "&campoBusca=" . $search);
+            }
+            $data['flag'] = 'cpf';
+        } elseif ($flag == "fantasia" || $flag == "cnpj") {
+            if ($flag == "fantasia") {
                 $pessoaJuridica =  PessoaJuridica::where([
                     ['fantasia', 'like', $search . '%']
                 ])->orderBy('fantasia', 'asc')->paginate(10);
 
 
 
-                $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
-
-            }else{
+                $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=" . $flag . "&campoBusca=" . $search);
+            } else {
                 $search = somentoNumeroCpfOuCnpj($search);
                 $pessoaJuridica =  PessoaJuridica::where([
                     ['cnpj', $search]
                 ])->orderBy('fantasia', 'asc')->paginate(10);
 
 
-                $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
+                $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=" . $flag . "&campoBusca=" . $search);
             }
             $data['flag'] = 'cnpj';
-
         }
 
         return view('boletoIndex', $data);
-      }
+    }
 
     public function listarBoletos($id = null, $flag = null)
     {
 
 
-        if($this->erroAutenticado()){
+        if ($this->erroAutenticado()) {
             return redirect()->route('index');
         }
 
         if ($flag == "cpf") {
 
 
-                $pessoaFisica =  json_decode(Pessoa_fisica::where([
-                    ['id',$id]
-                ])->get(), true);
+            $pessoaFisica =  json_decode(Pessoa_fisica::where([
+                ['id', $id]
+            ])->get(), true);
 
 
-                $pessoaFisica = $pessoaFisica[0];
+            $pessoaFisica = $pessoaFisica[0];
 
-                $cliente = json_decode(Clientes::where(
-                    'pessoa_fisica_id',
-                    $id
-                )->get(), true);
+            $cliente = json_decode(Clientes::where(
+                'pessoa_fisica_id',
+                $id
+            )->get(), true);
 
-                if($cliente == []){
-                    return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
-                }
-                $cliente = $cliente[0];
-
-                $pessoaFisica['idCliente'] = $cliente['id'];
-
-                $financeiro = Financeiros::where([
-                    ['cliente_id_web', $cliente['id']]
-                ])->orderBy('reg_vencimento', 'desc')->paginate(10);
-
-
-
-
-
-                $data['boletos'] = $financeiro;
-                $data['cliente'] = $pessoaFisica;
-                return view('boletoIndex', $data);
+            if ($cliente == []) {
+                return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
             }
-            else if ($flag == "cnpj") {
+            $cliente = $cliente[0];
+
+            $pessoaFisica['idCliente'] = $cliente['id'];
+
+            $financeiro = Financeiros::where([
+                ['cliente_id_web', $cliente['id']]
+            ])->orderBy('reg_vencimento', 'desc')->paginate(10);
+
+            foreach ($financeiro as $item) {
 
 
+                $valorExtra = Financeiros::valoresExtra($item['id']);
+                $descontoBoleto =  $valorExtra['desconto'];
+                $acrescimoBoleto =  $valorExtra['acrescimo'];
 
-                $pessoaJuridica =  json_decode(PessoaJuridica::where([
-                    ['id', $id]
-                ])->get(), true);
+                $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
 
 
-                $pessoaJuridica = $pessoaJuridica[0];
-
-                $cliente = json_decode(Clientes::where(
-                    'pessoa_juridica_id',
-                    $pessoaJuridica['id']
-                )->get(), true);
-
-                if($cliente == []){
-                    return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
-                }
-
-                $cliente = $cliente[0];
-
-                $pessoaJuridica['idCliente'] = $cliente['id'];
-                $financeiro = Financeiros::where([
-                    ['cliente_id_web', $cliente['id']]
-                ])->orderBy('reg_vencimento', 'desc')->paginate(10);
-
-                $pessoaJuridica['nome'] = $pessoaJuridica['fantasia'];
-                $data['boletos'] = $financeiro;
-                $data['cliente'] = $pessoaJuridica;
-
-                //dd($financeiro);
-
-                return view('boletoIndex', $data);
-
+                $item->desconto = $descontoBoleto;
+                $item->acrescimo = $acrescimoBoleto;
             }
+
+
+            $data['boletos'] = $financeiro;
+            $data['cliente'] = $pessoaFisica;
+            return view('boletoIndex', $data);
+        } else if ($flag == "cnpj") {
+
+
+
+            $pessoaJuridica =  json_decode(PessoaJuridica::where([
+                ['id', $id]
+            ])->get(), true);
+
+
+            $pessoaJuridica = $pessoaJuridica[0];
+
+            $cliente = json_decode(Clientes::where(
+                'pessoa_juridica_id',
+                $pessoaJuridica['id']
+            )->get(), true);
+
+            if ($cliente == []) {
+                return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
+            }
+
+            $cliente = $cliente[0];
+
+            $pessoaJuridica['idCliente'] = $cliente['id'];
+            $financeiro = Financeiros::where([
+                ['cliente_id_web', $cliente['id']]
+            ])->orderBy('reg_vencimento', 'desc')->paginate(10);
+
+            foreach ($financeiro as $item) {
+
+
+                $valorExtra = Financeiros::valoresExtra($item['id']);
+                $descontoBoleto =  $valorExtra['desconto'];
+                $acrescimoBoleto =  $valorExtra['acrescimo'];
+
+                $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
+
+
+                $item->desconto = $descontoBoleto;
+                $item->acrescimo = $acrescimoBoleto;
+            }
+
+            $pessoaJuridica['nome'] = $pessoaJuridica['fantasia'];
+            $data['boletos'] = $financeiro;
+            $data['cliente'] = $pessoaJuridica;
+
+            //dd($financeiro);
+
+            return view('boletoIndex', $data);
         }
+    }
 
 
     public function emitirBoletoUnitario($id = null)
     {
-        if($this->erroAutenticado()){
+        if ($this->erroAutenticado()) {
             return redirect()->route('index');
         }
 
@@ -196,12 +216,12 @@ class Boleto extends Controller
             $boleto[0]['cliente_id_web']
         )->get(), true);
         $boleto = $boleto[0];
-        if($cliente == []){
+        if ($cliente == []) {
             return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
         }
         $cliente = $cliente[0];
 
-        if(isset($cliente['pessoa_fisica_id'])){
+        if (isset($cliente['pessoa_fisica_id'])) {
 
             $pessoaFisica =  json_decode(Pessoa_fisica::where([
                 ['id', $cliente['pessoa_fisica_id']]
@@ -226,13 +246,18 @@ class Boleto extends Controller
             $sacado = new Agente($pessoaFisica['nome'], $pessoaFisica['cpf'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
             $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
 
+            $valorExtra = Financeiros::valoresExtra($boleto['id']);
+            $descontoBoleto =  $valorExtra['desconto'];
+            $acrescimoBoleto =  $valorExtra['acrescimo'];
+
+            $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
 
 
             $boletoSantander = new Santander(array(
                 // Parâmetros obrigatórios
 
                 'dataVencimento' => new DateTime($boleto['reg_vencimento']),
-                'valor' => $boleto['reg_valor'],
+                'valor' => $boleto['reg_valor_total'],
                 'sequencial' => $boleto['id'], // Para gerar o nosso número
                 'sacado' => $sacado,
                 'cedente' => $cedente,
@@ -240,10 +265,10 @@ class Boleto extends Controller
                 'carteira' => 101,
                 'conta' => 1300398, // Até 8 dígitos
                 'convenio' => 9818596, // 4, 6 ou 7 dígitos
-                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web']."", 10, "0")
+                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web'] . "", 10, "0")
             ));
 
-            $msg = str_replace("\n","<br>", $boleto['descricao']);
+            $msg = str_replace("\n", "<br>", $boleto['descricao']);
 
             $arr = [
                 0 => 'Pagar antes da data do vencimento',
@@ -253,7 +278,7 @@ class Boleto extends Controller
             $boletoSantander->setInstrucoes($arr);
 
             echo $boletoSantander->getOutput();
-        }else{
+        } else {
             $pessoaJuridica =  json_decode(PessoaJuridica::where([
                 ['id', $cliente['pessoa_juridica_id']]
             ])->get(), true);
@@ -277,13 +302,18 @@ class Boleto extends Controller
             $sacado = new Agente($pessoaJuridica['fantasia'], $pessoaJuridica['cnpj'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
             $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
 
+            $valorExtra = Financeiros::valoresExtra($boleto['id']);
+            $descontoBoleto =  $valorExtra['desconto'];
+            $acrescimoBoleto =  $valorExtra['acrescimo'];
+
+            $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
 
 
             $boletoSantander = new Santander(array(
                 // Parâmetros obrigatórios
 
                 'dataVencimento' => new DateTime($boleto['reg_vencimento']),
-                'valor' => $boleto['reg_valor'],
+                'valor' => $boleto['reg_valor_total'],
                 'sequencial' => $boleto['id'], // Para gerar o nosso número
                 'sacado' => $sacado,
                 'cedente' => $cedente,
@@ -291,10 +321,10 @@ class Boleto extends Controller
                 'carteira' => 101,
                 'conta' => 1300398, // Até 8 dígitos
                 'convenio' => 9818596, // 4, 6 ou 7 dígitos
-                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web']."", 10, "0")
+                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web'] . "", 10, "0")
             ));
 
-            $msg = str_replace("\n","<br>", $boleto['descricao']);
+            $msg = str_replace("\n", "<br>", $boleto['descricao']);
 
             $arr = [
                 0 => 'Pagar antes da data do vencimento',
@@ -304,20 +334,25 @@ class Boleto extends Controller
             $boletoSantander->setInstrucoes($arr);
 
             echo $boletoSantander->getOutput();
-
         }
-
-
     }
 
-    public function boletosMassaView(){
+    public function boletosMassaView()
+    {
+        if ($this->erroAutenticado()) {
+            return redirect()->route('index');
+        }
 
         $dados['data'] = "";
         return view('massa', $dados);
     }
 
     //GERAR BOLETOS EM MASSA, IMPRIMIR TODOS OS BOLETOS, DE 200 EM 200
-    public function boletosEmMassa(Request $request){
+    public function boletosEmMassa(Request $request)
+    {
+        if ($this->erroAutenticado()) {
+            return redirect()->route('index');
+        }
 
         $search =  $request->get('data');
         //dd($search);
@@ -328,27 +363,39 @@ class Boleto extends Controller
             ['reg_lancamento', 'like', $search . '%']
         ])->paginate(200);
 
-        $boleto->withPath("/boletos/massa/buscar?data=".$search);
+        foreach($boleto as $item){
+
+            $valorExtra = Financeiros::valoresExtra($item->id);
+            $descontoBoleto =  $valorExtra['desconto'];
+            $acrescimoBoleto =  $valorExtra['acrescimo'];
+
+            $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
+        }
+
+
+        $boleto->withPath("/boletos/massa/buscar?data=" . $search);
         $dados["boletos"] = $boleto;
         $dados['data'] = $search;
 
         //dd($dados["boletos"]);
         return view('massa', $dados);
-
-
     }
 
-    public function imprimirMassa(Request $request){
+    public function imprimirMassa(Request $request)
+    {
 
+        if ($this->erroAutenticado()) {
+            return redirect()->route('index');
+        }
 
         $boletoID = explode(',', $request->get('imprimirTodos'));
 
-        foreach($boletoID as $id){
+        foreach ($boletoID as $id) {
+
 
             $boleto = json_decode(Financeiros::where([
                 ['id', $id]
             ])->get(), true);
-
 
             $cliente = json_decode(Clientes::where(
                 'id',
@@ -356,7 +403,7 @@ class Boleto extends Controller
             )->get(), true);
             $boleto = $boleto[0];
             $cliente = $cliente[0];
-            if(isset($cliente['pessoa_fisica_id'])){
+            if (isset($cliente['pessoa_fisica_id'])) {
 
                 $pessoaFisica =  json_decode(Pessoa_fisica::where([
                     ['id', $cliente['pessoa_fisica_id']]
@@ -381,13 +428,18 @@ class Boleto extends Controller
                 $sacado = new Agente($pessoaFisica['nome'], $pessoaFisica['cpf'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
                 $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
 
+                $valorExtra = Financeiros::valoresExtra($boleto['id']);
+                $descontoBoleto =  $valorExtra['desconto'];
+                $acrescimoBoleto =  $valorExtra['acrescimo'];
+
+                $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
 
 
                 $boletoSantander = new Santander(array(
                     // Parâmetros obrigatórios
 
                     'dataVencimento' => new DateTime($boleto['reg_vencimento']),
-                    'valor' => $boleto['reg_valor'],
+                    'valor' => $boleto['reg_valor_total'],
                     'sequencial' => $boleto['id'], // Para gerar o nosso número
                     'sacado' => $sacado,
                     'cedente' => $cedente,
@@ -397,7 +449,7 @@ class Boleto extends Controller
                     'convenio' => 9818596, // 4, 6 ou 7 dígitos
                 ));
 
-                $msg = str_replace("\n","<br>", $boleto['descricao']);
+                $msg = str_replace("\n", "<br>", $boleto['descricao']);
 
                 $arr = [
                     0 => 'Pagar antes da data do vencimento',
@@ -407,7 +459,7 @@ class Boleto extends Controller
                 $boletoSantander->setInstrucoes($arr);
 
                 echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
-            }else{
+            } else {
                 $pessoaJuridica =  json_decode(PessoaJuridica::where([
                     ['id', $cliente['pessoa_juridica_id']]
                 ])->get(), true);
@@ -431,13 +483,17 @@ class Boleto extends Controller
                 $sacado = new Agente($pessoaJuridica['fantasia'], $pessoaJuridica['cnpj'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
                 $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
 
+                $valorExtra = Financeiros::valoresExtra($boleto['id']);
+                $descontoBoleto =  $valorExtra['desconto'];
+                $acrescimoBoleto =  $valorExtra['acrescimo'];
 
+                $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
 
                 $boletoSantander = new Santander(array(
                     // Parâmetros obrigatórios
 
                     'dataVencimento' => new DateTime($boleto['reg_vencimento']),
-                    'valor' => $boleto['reg_valor'],
+                    'valor' => $boleto['reg_valor_total'],
                     'sequencial' => $boleto['id'], // Para gerar o nosso número
                     'sacado' => $sacado,
                     'cedente' => $cedente,
@@ -447,7 +503,7 @@ class Boleto extends Controller
                     'convenio' => 9818596, // 4, 6 ou 7 dígitos
                 ));
 
-                $msg = str_replace("\n","<br>", $boleto['descricao']);
+                $msg = str_replace("\n", "<br>", $boleto['descricao']);
 
                 $arr = [
                     0 => 'Pagar antes da data do vencimento',
@@ -457,10 +513,46 @@ class Boleto extends Controller
                 $boletoSantander->setInstrucoes($arr);
 
                 echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
-
             }
         }
     }
 
+    public function baixaBoleto(Request $request)
+    {
 
+        if ($this->erroAutenticado()) {
+            return redirect()->route('index');
+        }
+
+        $validated = $request->validate([
+            'idBoleto' => 'required',
+            'valor_pago' => 'required',
+            'vencimento' => 'required',
+            'mes_referencia' => 'required',
+            'ano_referencia' => 'required',
+            'reg_valor' => 'required',
+            'mensalidade' => 'required',
+            'tipo_bx' => 'required'
+        ]);
+
+        if (intval($request->get('valor_pago')) > 0) {
+            $id = $request->get('id');
+
+            $boleto = Financeiros::find($id);
+
+            $boleto->reg_baixa = 2;
+            $boleto->bx_valor_pago = $request->get('valor_pago');
+            $boleto->bx_pagamento = date('Y-m-d ');
+            $boleto->reg_vencimento = $request->get('vencimento');
+            $boleto->mes_referencia = $request->get('mes_referencia');
+            $boleto->ano_referencia = $request->get('ano_referencia');
+            $boleto->reg_valor = $request->get('reg_valor');
+            $boleto->mensalidade = $request->get('mensalidade');
+
+            $boleto->timestamps = false;
+            $boleto->save();
+
+            return redirect()->back()->with(['success' => 'Baixa realizada com sucesso!']);
+        }
+    }
 }
