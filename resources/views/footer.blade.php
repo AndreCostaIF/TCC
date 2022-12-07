@@ -13,6 +13,7 @@
     <script src="{{ asset('bootstrap/bootstrap.js') }}"></script>
     <script src="{{ asset('form.js') }}"></script>
     <script src="{{ asset('modal.js') }}"></script>
+    <script src="{{ asset('copy.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.21.0/moment.min.js"></script>
 </footer>
 </body>
