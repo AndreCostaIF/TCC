@@ -16,7 +16,7 @@ mix.scripts(['node_modules/jquery/dist/jquery.js'],
  .scripts('node_modules/bootstrap/dist/js/bootstrap.bundle.js',
             'public/bootstrap/bootstrap.js')
 .scripts('resources/js/form.js', 'public/form.js')
-.scripts('resources/js/modal.js', 'public/modal.js')
+.scripts(['resources/js/modal.js','resources/js/copy.js'] , 'public/modal.js')
 
 mix.sass('node_modules/bootstrap/scss/bootstrap.scss',
 'public/bootstrap/bootstrap.css');

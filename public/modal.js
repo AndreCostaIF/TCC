@@ -39,6 +39,26 @@ $('#botaoDarBaixa').on('click', function () {
 
 });
 
+
+if ($("#confirmDelete").length) {
+    const myModalEl = document.getElementById('deleteBoleto')
+    myModalEl.addEventListener('hidden.bs.modal', event => {
+        $("#confirmDelete").prop("checked", false);
+        $(".excluirBoletoButton").attr("disabled", true);
+    })
+}
+
+if ($("#maisInfo").length) {
+    const myModalEl = document.getElementById('maisInfo')
+    myModalEl.addEventListener('hidden.bs.modal', event => {
+        $('.BoxDesconto').hide()
+        $('.BoxAcrescimo').hide()
+        if ($(".msgInfo").length) {
+            $(".msgInfo").remove()
+        }
+    })
+}
+
 $('.copiar').on('click', function () {
 
     navigator.clipboard.writeText(this.innerText)
@@ -59,26 +79,5 @@ $('.copiarLD').on('click', function () {
     '</div></div>')
     navigator.clipboard.writeText(this.parentElement.children[0].value)
 
-   // alert('texto copiado!')
 
 });
-
-
-if ($("#confirmDelete").length) {
-    const myModalEl = document.getElementById('deleteBoleto')
-    myModalEl.addEventListener('hidden.bs.modal', event => {
-        $("#confirmDelete").prop("checked", false);
-        $(".excluirBoletoButton").attr("disabled", true);
-    })
-}
-
-if ($("#maisInfo").length) {
-    const myModalEl = document.getElementById('maisInfo')
-    myModalEl.addEventListener('hidden.bs.modal', event => {
-        $('.BoxDesconto').hide()
-        $('.BoxAcrescimo').hide()
-        if ($(".msgInfo").length) {
-            $(".msgInfo").remove()
-        }
-    })
-}
