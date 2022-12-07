@@ -86,12 +86,20 @@
 {{-- COLOCAR IF SE EXISTIR CLIENTE --}}
 @if (isset($cliente))
     @if (isset($boletos))
+        <div class="mt-4">
+            <div class=" divSuccessCopy" >
 
-        <div class="mt-5">
+            </div>
             <table class="table  table-hover">
                 <thead>
                     <tr>
                         <th scope="col">Cliente</th>
+
+                        @if (isset($cliente['cpf']))
+                            <th scope="col">CPF</th>
+                        @elseif (isset($cliente['cnpj']))
+                            <th scope="col">CNPJ</th>
+                        @endif
                         <th scope="col">ID</th>
                         <th scope="col">Lançamento</th>
                         <th scope="col">Vencimento</th>
@@ -115,7 +123,14 @@
                             <tr class="boletoPago">
                                 <th scope="row"><a
                                         href="http://177.223.83.142/admin/clientes/visualizar/id/{{ $cliente['idCliente'] }}"
-                                        target="_blank">{{ $cliente['nome'] }}</a> </th>
+                                        target="_blank">{{ $cliente['nome'] }}</a>
+                                </th>
+                                @if (isset($cliente['cpf']))
+                                    <td><a href="#" class="copiar"> {{ formatarCpf($cliente['cpf']) }}</a></td>
+                                @elseif (isset($cliente['cnpj']))
+                                    <td><a href="#" class="copiar">{{ formatarCnpj($cliente['cnpj']) }} </a></td>
+                                @endif
+
                                 <td class="idBoleto">{{ $boleto->id }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
@@ -138,8 +153,7 @@
                                             @endphp
                                             <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#maisInfo"
-                                                    onclick="info({{$dado}})">
+                                                    data-bs-target="#maisInfo" onclick="info({{ $dado }})">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
@@ -154,11 +168,19 @@
 
                             </tr>
                         @endif
+
                         @if ($boleto->reg_baixa == 0 && $boleto->reg_deleted == 0 && $vencimento >= date('y-m-d'))
                             <tr class="boletoAberto">
                                 <th scope="row"><a
                                         href="http://177.223.83.142/admin/clientes/visualizar/id/{{ $cliente['idCliente'] }}"
-                                        target="_blank">{{ $cliente['nome'] }}</a> </th>
+                                        target="_blank">{{ $cliente['nome'] }}</a>
+                                </th>
+
+                                @if (isset($cliente['cpf']))
+                                    <td><a href="#" class="copiar"> {{ formatarCpf($cliente['cpf']) }}</a></td>
+                                @elseif (isset($cliente['cnpj']))
+                                    <td><a href="#" class="copiar">{{ formatarCnpj($cliente['cnpj']) }} </a></td>
+                                @endif
                                 <td>{{ $boleto->id }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
@@ -193,17 +215,38 @@
                                             @endphp
                                             <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#maisInfo"
-                                                    onclick="info({{$dado}})">
+                                                    data-bs-target="#maisInfo" onclick="info({{ $dado }})">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
+                                            @if (session()->get('grupo_users_id') == 1 || session()->get('grupo_users_id') == 2)
+                                                {{-- <li>
+                                                    @php
+                                                        $dado = [
+                                                            'idBoleto'      => $boleto->id,
+                                                            'vencimento'    => formatDateAndTime($boleto->reg_vencimento),
+                                                            'vencimento2'   => $boleto->reg_vencimento,
+                                                            'valor'         => formatNumber($boleto->reg_valor_total),
+                                                            'mes_ref'       => $boleto->mes_referencia,
+                                                            'ano_ref'       => $boleto->ano_referencia,
+                                                            'cliente'       => $cliente['nome'],
+                                                        ];
+                                                        $dado = json_encode($dado);
+                                                    @endphp
+                                                    <button class="dropdown-item" type="button"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteBoleto"
+                                                        onclick="deleteBoleto({{ $dado }})">
+                                                        <i class="bi bi-trash3 text-danger"></i> Excluir boleto
+                                                    </button>
+                                                </li> --}}
+                                            @endif
                                         </ul>
                                     </div>
                                 </td>
                                 <td>
                                     <a target="_blank" href="{{ route('imprimirBoleto', [$boleto->id]) }}">
-                                        <img src="{{ asset('assets/boleto.png') }}" class="imgBoleto" alt="">
+                                        <img src="{{ asset('assets/boleto.png') }}" class="imgBoleto"
+                                            alt="">
                                     </a>
                                 </td>
 
@@ -216,7 +259,15 @@
                             <tr class="boletoAtraso">
                                 <th scope="row"><a
                                         href="http://177.223.83.142/admin/clientes/visualizar/id/{{ $cliente['idCliente'] }}"
-                                        target="_blank">{{ $cliente['nome'] }}</a> </th>
+                                        target="_blank">{{ $cliente['nome'] }}</a>
+                                </th>
+
+                                @if (isset($cliente['cpf']))
+                                    <td><a href="#" class="copiar"> {{ formatarCpf($cliente['cpf']) }}</a></td>
+                                @elseif (isset($cliente['cnpj']))
+                                    <td><a href="#" class="copiar">{{ formatarCnpj($cliente['cnpj']) }} </a>
+                                    </td>
+                                @endif
                                 <td>{{ $boleto->id }}</td>
 
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
@@ -231,18 +282,23 @@
                                             <i class="bi h4 bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="https://www.santander.com.br/2-via-boleto" target="_blank"
+                                                    class="dropdown-item" type="button">
+                                                    <i class="bi bi-receipt-cutoff text-danger"></i> 2º via
+                                                </a>
+                                            </li>
                                             {{-- <li>
-
                                                 @php
                                                     $dado = [
-                                                        'idBoleto' => $boleto->id,
-                                                        'vencimento' => $boleto->reg_vencimento,
-                                                        'valor' => formatNumber($boleto->reg_valor_total),
-                                                        'mes_ref' => $boleto->mes_referencia,
-                                                        'ano_ref' => $boleto->ano_referencia,
-                                                        'mensalidade' => $boleto->mensalidade,
-                                                        'tipo_baixa' => $boleto->reg_baixa,
-                                                        'valor_pago' => formatNumber($boleto->bx_valor_pago),
+                                                        'idBoleto'      => $boleto->id,
+                                                        'vencimento'    => $boleto->reg_vencimento,
+                                                        'valor'         => formatNumber($boleto->reg_valor_total),
+                                                        'mes_ref'       => $boleto->mes_referencia,
+                                                        'ano_ref'       => $boleto->ano_referencia,
+                                                        'mensalidade'   => $boleto->mensalidade,
+                                                        'tipo_baixa'    => $boleto->reg_baixa,
+                                                        'valor_pago'    => formatNumber($boleto->bx_valor_pago),
                                                     ];
                                                     $dado = json_encode($dado);
                                                 @endphp
@@ -251,17 +307,57 @@
                                                     onclick="darbaixa({{ $dado }})">
                                                     <i class="bi bi-currency-dollar text-success"></i> Dar baixa
                                                 </button>
-                                            </li>
+                                            </li> --}}
                                             <li>
+                                                <input type="hidden" value="{{ $boleto->linhaDigitavel }}"
+                                                    class="LD">
+                                                <a href="#" class="copiarLD dropdown-item"
+                                                    class="dropdown-item" type="button">
+                                                    <i class="bi bi-clipboard2 text-primary"></i> Copiar código de
+                                                    barras
+                                                </a>
+                                            </li>
+                                            {{-- <li>
                                                 <button class="dropdown-item" type="button">
                                                     <i class="bi bi-pencil-square text-primary"></i> Editar boleto
                                                 </button>
                                             </li> --}}
-                                            <li><button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#maisInfo">
+                                            @php
+                                                $dado = [
+                                                    'desconto' => $boleto->desconto,
+                                                    'acrescimo' => $boleto->acrescimo,
+                                                ];
+                                                $dado = json_encode($dado);
+                                            @endphp
+                                            <li>
+                                                <button class="dropdown-item" type="button" data-bs-toggle="modal"
+                                                    data-bs-target="#maisInfo" onclick="info({{ $dado }})">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
+                                            @if (session()->get('grupo_users_id') == 1 || session()->get('grupo_users_id') == 2)
+                                                {{-- <li>
+                                                    @php
+                                                        $dado = [
+                                                            'idBoleto' => $boleto->id,
+                                                            'vencimento' => formatDateAndTime($boleto->reg_vencimento),
+                                                            'vencimento2' => $boleto->reg_vencimento,
+                                                            'valor' => formatNumber($boleto->reg_valor_total),
+                                                            'mes_ref' => $boleto->mes_referencia,
+                                                            'ano_ref' => $boleto->ano_referencia,
+                                                            'cliente' => $cliente['nome'],
+                                                        ];
+                                                        $dado = json_encode($dado);
+                                                    @endphp
+                                                    <button class="dropdown-item" type="button"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteBoleto"
+                                                        onclick="deleteBoleto({{ $dado }})">
+                                                        <i class="bi bi-trash3 text-danger"></i> Excluir boleto
+                                                    </button>
+                                                </li> --}}
+                                            @endif
+
+
                                         </ul>
                                     </div>
                                 </td>
@@ -429,28 +525,31 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-info-circle text-info"></i> Informações</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i
+                                class="bi bi-info-circle text-info"></i> Informações</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                       <div class="">
-                        <div class="BoxDesconto mb-3" style="display: none">
-                            <div class="h5 text-primary text-center border-bottom">Descontos <i class="bi  bi-graph-down-arrow"></i></div>
-                            <div class="d-flex justify-content-between ">
-                                <span class="desconto fw-bold">Desconto:</span>
-                                <span class="descontoValor text-primary fw-bold"> R$10,00</span>
+                        <div class="">
+                            <div class="BoxDesconto mb-3" style="display: none">
+                                <div class="h5 text-primary text-center border-bottom">Descontos <i
+                                        class="bi  bi-graph-down-arrow"></i></div>
+                                <div class="d-flex justify-content-between ">
+                                    <span class="desconto fw-bold">Desconto:</span>
+                                    <span class="descontoValor text-primary fw-bold"> R$10,00</span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="BoxAcrescimo mb-3" style="display: none">
-                            <div class="h5 text-success text-center border-bottom">Acréscimos <i class="bi  bi-graph-up-arrow"></i></div>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span class="acrescimo fw-bold">Acréscimo:</span>
-                                <span class="acrescimoValor text-success fw-bold"></span>
+                            <div class="BoxAcrescimo mb-3" style="display: none">
+                                <div class="h5 text-success text-center border-bottom">Acréscimos <i
+                                        class="bi  bi-graph-up-arrow"></i></div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="acrescimo fw-bold">Acréscimo:</span>
+                                    <span class="acrescimoValor text-success fw-bold"></span>
+                                </div>
                             </div>
                         </div>
-                       </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -458,8 +557,89 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal delete boleto-->
+        <div class="modal fade" id="deleteBoleto" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel"> <i class="bi bi-trash3 text-danger"></i>
+                            Excluir boleto</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="">
+                            <div class="card">
+                                <h5 class="card-header d-flex justify-content-between">
+                                    <span>
+                                        Fatura - <span class="faturaID"></span>
+                                    </span>
+
+                                    <small class="h6">
+                                        Situação: <small class="situacao"></small>
+                                    </small>
+                                </h5>
+                                <div class="card-body">
+                                    <h5 class="p-2 card-title  border-bottom d-flex justify-content-between">
+                                        <span class="fw-bold nomeCliente"></span>
+                                        <span><i class="bi bi-person-badge"></i></span>
+                                    </h5>
+                                    <div class="mb-3 p-2">
+                                        <div class="card-text mb-2 d-flex justify-content-between">
+                                            <span class="fw-bold">ID do boleto:</span>
+                                            <span class="faturaID"></span>
+                                        </div>
+
+                                        <div class="card-text mb-2 d-flex justify-content-between">
+                                            <span class="fw-bold">Vencimento:</span>
+                                            <span class="vencimento"></span>
+                                        </div>
+
+                                        <div class="card-text mb-2 d-flex justify-content-between">
+                                            <span class="fw-bold">Fatura referente a:</span>
+                                            <span class="refBoleto"></span>
+                                        </div>
+
+                                        <div class="card-text mb-2 d-flex justify-content-between">
+                                            <span class="fw-bold">Valor:</span>
+                                            <span class="valorBoleto"></span>
+                                        </div>
+                                        <hr>
+                                        <div class="mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value=""
+                                                    id="confirmDelete">
+                                                <label class="form-check-label" for="flexCheckDefault">
+                                                    Confirmo que desejo excluir este boleto.
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <form action="#" method="get">
+                                        <div class="hiddens">
+                                            @csrf
+                                            <input type="hidden" name="idBoleto" value="">
+                                        </div>
+                                        <button href="#" class="btn w-100 btn-danger excluirBoletoButton"
+                                            disabled>
+                                            <i class="bi bi-trash3 "></i> Excluir boleto
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     @else
     @endif
 @endif
-
 @include('footer')

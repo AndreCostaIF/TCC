@@ -29,7 +29,7 @@ class LoginContoller extends Controller
         }
         $credenciais = $credenciais[0];
         //dd($credenciais);
-        if ($credenciais['grupo_users_id'] == 9 || $credenciais['grupo_users_id'] == 1) {
+        if ($credenciais['grupo_users_id'] == 2 || $credenciais['grupo_users_id'] == 1 || $credenciais['grupo_users_id'] == 3) {
             if (password_verify($senha, $credenciais['pass'])) {
 
                 $dados = [
