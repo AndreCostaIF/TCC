@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Financeiros extends Model
+class LoginRadius extends Model
 {
     use HasFactory;
-    protected $table = 'financeiros';
-    protected $timestamps = FALSE;
+    protected $table = 'login_radius';
+    protected $connection = 'mysql2';
 }

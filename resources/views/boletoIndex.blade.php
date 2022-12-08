@@ -25,7 +25,6 @@
         </div>
 
         <div class="">
-
             <button type="submit" class="btn botaoForm" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
         </div>
 

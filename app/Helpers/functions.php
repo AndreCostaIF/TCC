@@ -51,4 +51,20 @@
             return null;
         }
     }
+
+
+    function completarPosicoes($campo, $posicoes, $complemento)
+    {
+        //verifica se o valor total de É MAIOR QUE
+        if (strlen($campo) < $posicoes) {
+
+            $completar = $posicoes - strlen($campo);
+
+            $campo = str_pad("", $completar, $complemento) . $campo;
+        } else if (strlen($campo) > $posicoes) {
+            $campo = substr($campo, 0, $posicoes);
+        }
+
+        return $campo;
+    }
 ?>

@@ -10,7 +10,10 @@ use openBoleto\Agente;
 use openBoleto\Banco\Santander;
 use App\Models\Clientes;
 use App\Models\Financeiros;
+use App\Models\LoginAdmin;
+use App\Models\LoginRadius;
 use App\Models\PessoaJuridica;
+use App\Models\PlanoContratado;
 use Illuminate\Support\Facades\DB;
 use DateTime;
 use OpenBoleto\BoletoAbstract;
@@ -28,20 +31,16 @@ class Boleto extends Controller
 
         }
     }
-    public function index($data = null)
+    public function index()
     {
         if($this->erroAutenticado()){
             return redirect()->route('index');
         }else{
-            if($data != null){
-
-                return view('boletoIndex', $data);
-            }else{
-                return view('boletoIndex');
-            }
+            return view('boletoIndex');
         }
 
     }
+
 
     public function buscarCliente(Request $request){
 
@@ -51,7 +50,7 @@ class Boleto extends Controller
         $search =  $request->get('campoBusca');
         $flag = $request->get('flag');
 
-        //dd($flag);
+
 
 
         if ($flag == "nome" || $flag == "cpf") {
@@ -61,7 +60,7 @@ class Boleto extends Controller
                     ['nome', 'like', $search . '%']
                 ])->orderBy('nome', 'asc')->paginate(10);
 
-                $data['clientesBusca'] =  $pessoaFisica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
+                $data['clientesBusca'] = $pessoaFisica;
 
             }else{
                 $search = somentoNumeroCpfOuCnpj($search);
@@ -70,18 +69,18 @@ class Boleto extends Controller
                 ])->orderBy('nome', 'asc')->paginate(10);
 
 
-                $data['clientesBusca'] = $pessoaFisica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
+                $data['clientesBusca'] = $pessoaFisica;
 
             } $data['flag'] = 'cpf';
         }elseif($flag == "fantasia" || $flag == "cnpj"){
             if($flag == "fantasia"){
                 $pessoaJuridica =  PessoaJuridica::where([
-                    ['fantasia', 'like', $search . '%']
-                ])->orderBy('fantasia', 'asc')->paginate(10);
+                    ['fantasia', 'like', '%' . $search . '%']
+                ])->orderBy('nome', 'asc')->paginate(10);
 
 
 
-                $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
+                $data['clientesBusca'] = $pessoaJuridica;
 
             }else{
                 $search = somentoNumeroCpfOuCnpj($search);
@@ -90,18 +89,18 @@ class Boleto extends Controller
                 ])->orderBy('fantasia', 'asc')->paginate(10);
 
 
-                $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=".$flag."&campoBusca=".$search);
+                $data['clientesBusca'] = $pessoaJuridica;
             }
             $data['flag'] = 'cnpj';
 
         }
 
         return view('boletoIndex', $data);
-      }
+
+    }
 
     public function listarBoletos($id = null, $flag = null)
     {
-
 
         if($this->erroAutenticado()){
             return redirect()->route('index');
@@ -230,6 +229,7 @@ class Boleto extends Controller
                 'carteira' => 101,
                 'conta' => 1300398, // Até 8 dígitos
                 'convenio' => 9818596, // 4, 6 ou 7 dígitos
+                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web']."", 10, "0")
             ));
 
             $msg = str_replace("\n","<br>", $boleto['descricao']);
@@ -280,6 +280,7 @@ class Boleto extends Controller
                 'carteira' => 101,
                 'conta' => 1300398, // Até 8 dígitos
                 'convenio' => 9818596, // 4, 6 ou 7 dígitos
+                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web']."", 10, "0")
             ));
 
             $msg = str_replace("\n","<br>", $boleto['descricao']);
@@ -316,9 +317,11 @@ class Boleto extends Controller
             ['reg_lancamento', 'like', $search . '%']
         ])->paginate(200);
 
+
         $boleto->withPath("/boletos/massa/buscar?data=".$search);
         $dados["boletos"] = $boleto;
         $dados['data'] = $search;
+
 
         //dd($dados["boletos"]);
         return view('massa', $dados);
@@ -328,7 +331,10 @@ class Boleto extends Controller
 
     public function imprimirMassa(Request $request){
 
+        if($request->get('imprimirTodos') == null){
 
+            return redirect()->back()->with('erro', "Nenhum boleto encontrado");
+        }
         $boletoID = explode(',', $request->get('imprimirTodos'));
 
         foreach($boletoID as $id){
@@ -451,4 +457,94 @@ class Boleto extends Controller
     }
 
 
+    public function baixaBoleto(Request $request){
+
+        $validated = $request->validate([
+            'id' => 'required|integer',
+            'valor_pago' => 'required|numeric',
+            'vencimento' => 'required',
+            'mes_referencia' => 'required',
+            'ano_referencia' => 'required',
+            'reg_valor' => 'required|numeric',
+            'mensalidade' => 'required|integer'
+        ]);
+
+         $id = $request->get('id');
+
+         $boleto = Financeiros::find($id);
+
+         $boleto->reg_baixa = 2;
+         $boleto->bx_valor_pago = $request->get('valor_pago');
+         $boleto->bx_pagamento = date('Y-m-d ');
+         $boleto->reg_vencimento = $request->get('vencimento');
+         $boleto->mes_referencia = $request->get('mes_referencia');
+         $boleto->ano_referencia = $request->get('ano_referencia');
+         $boleto->reg_valor = $request->get('reg_valor');
+         $boleto->mensalidade = $request->get('mensalidade');
+
+         $boleto->timestamps = false;
+         $boleto->save();
+
+         return redirect()->back()->with(['success' => 'Baixa realizada com sucesso!']);
+    }
+
+
+
+    public function liberarCliente($idCliente){
+
+        $cliente = Clientes::find($idCliente);
+
+        if($cliente->status_id != 14){
+            return redirect()->back()->with('erro', "Cliente já está liberado");
+        }else{
+            $dataAtual = date('Y-m-d');
+            $intervaloBloqueio = $cliente->bloqueio_intervalo;
+
+            $financeiro = Financeiros::where([
+                ['cliente_id_web', $cliente->id],
+                ['mensalidade', 1],
+                ['reg_deleted', 0],
+                ['reg_baixa', 0],
+                ['reg_vencimento', '<', $dataAtual],
+                ['DATEDIFF(NOW(), reg_vencimento)', '>', $intervaloBloqueio]
+            ])
+            ->orWhere([
+                ['cliente_id_web', $cliente->id],
+                ['reg_historico', 'like', 'MENSALIDADE'.'%'],
+                ['reg_deleted', 0],
+                ['reg_baixa', 0],
+                ['reg_vencimento', '<', $dataAtual],
+                ['DATEDIFF(NOW(), reg_vencimento)', '>', $intervaloBloqueio]
+            ])->orderBy('reg_vencimento', 'ASC')->paginate(1);
+
+
+            if($financeiro->total()){
+
+                $cliente->status_id = 2;
+
+                $planosContratado = PlanoContratado::where([
+                    ['clientes_id', $cliente->id],
+                    ['status_id', 19]
+                ])->get();
+
+
+                foreach($planosContratado as $plano){
+
+                    $plano->status_id = 20;
+
+                    $adminLogin = LoginAdmin::find($plano->login_radius_id);
+                    $adminLogin->enable = 1;
+
+                    $loginRadius = LoginRadius::where([
+                        ['username', $adminLogin->username]
+                    ])->get();
+
+                    $loginRadius->enable = 1;
+                    $loginRadius->value = "Accept";
+                    //verificar como funciona essa questão do radius
+
+                }
+             }
+        }
+    }
 }

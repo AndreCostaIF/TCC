@@ -10,7 +10,7 @@
 
 
         <div class="form-floating col-md-6">
-            <input type="date" class="form-control" value="2022-09-25" name="data" id="floatingInput"
+            <input type="date" class="form-control" name="data" id="floatingInput"
                 placeholder="name@example.com" required>
             <label for="floatingInput" id="campoBusca">Informe a data</label>
         </div>
@@ -63,6 +63,13 @@
             </table>
 
         </div>
+
+        @if (session('erro'))
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> {{ session('erro') }}
+                </div>
+        @endif
     @endif
+
 </div>
 @include('footer')

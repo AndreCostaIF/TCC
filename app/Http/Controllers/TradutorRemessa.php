@@ -97,7 +97,7 @@ class TradutorRemessa extends Controller
             $cnpjOuCpf = "07692425000158"; // 004 - 017 (014)
             $codTransmissao = "45430981859601300398"; // 018 - 037 (020)
             $controleParticipante = "0000000000000000000000" . $i + 100; // 038 - 062 (025)
-            $nossoNumero = "00000000"; // 063 - 070 (008)
+            $nossoNumero = substr($x, 73, 8); // 063 - 070 (008)
             $dataSegundoDesc = "000000"; // 071 - 076 (006)
             $branco1espaco = str_pad("", 1, " "); // 077 - 077 (001)
             $infoMulta = "4"; // 078 - 078 (001)
