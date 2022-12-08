@@ -9,5 +9,5 @@ class LoginAdmin extends Model
 {
     use HasFactory;
     protected $table = 'login';
-    protected $connection = 'mysql2';
+    protected $connection = 'mysql3';
 }

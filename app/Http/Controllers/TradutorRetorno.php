@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\historicoRetorno;
 use Illuminate\Http\Request;
 
 class TradutorRetorno extends Controller
@@ -31,6 +32,21 @@ class TradutorRetorno extends Controller
         return $campo;
     }
 
+    private function completarPosicoes2($campo, $posicoes, $complemento)
+    {
+        //verifica se o valor total de É MAIOR QUE
+        if (strlen($campo) < $posicoes) {
+
+            $completar = $posicoes - strlen($campo);
+
+            $campo = $campo . str_pad("", $completar, $complemento);
+        } else if (strlen($campo) > $posicoes) {
+            $campo = substr($campo, 0, $posicoes);
+        }
+
+        return $campo;
+    }
+
     public function index(Request $request){
         if($this->erroAutenticado()){
             return redirect()->route('index');
@@ -38,12 +54,14 @@ class TradutorRetorno extends Controller
         //dd($request->get('retornoBradesco'));
 
         if($request->get('retornoBradesco')){
+            $retorno['historico'] = historicoRetorno::pegarTodos();
             $retorno['retornoBradesco'] = $request->get('retornoBradesco');
             $retorno['dataGerado'] = $request->get('dataGerado');
             $retorno['horaGerado'] = $request->get('horaGerado');
             return view('retorno', $retorno);
         }else{
-          return view('retorno');
+            $retorno['historico'] = historicoRetorno::pegarTodos();
+          return view('retorno', $retorno);
         }
     }
 
@@ -61,6 +79,7 @@ class TradutorRetorno extends Controller
         //TROCA O PUBLIC POR STORAGE NA URL
         $name = str_replace('public', 'storage', $name);
 
+
         //INICIO HEADER
         $retornoSantander = file($name);
         $x = $retornoSantander[0];
@@ -69,7 +88,7 @@ class TradutorRetorno extends Controller
         $codigoEmpresa       = "00000000000007891680"; //027 - 046 (020)
         $nomeEmpresa         = substr($x, 46, 30); // 047 - 076 (030)
         $codigoBanco         = "237"; // 077 - 079 (003)
-        $nomeBanco           = $this->completarPosicoes('BRADESCO', 15, ' '); // 080 - 094 (015)
+        $nomeBanco           = $this->completarPosicoes2('BRADESCO', 15, ' '); // 080 - 094 (015)
         $dataGravacao        = substr($x, 94, 6); //095 - 100 (006)
         $zeros               = str_pad("", 8, "0"); // 101 - 108 (008)
         $numAviso            = str_pad("", 5, "0"); // 109 - 113 (005)
@@ -82,7 +101,7 @@ class TradutorRetorno extends Controller
         $zeros . $numAviso . $branco266 . $dataCredito . $branco9 . $numSequencialHeader;
 
         //NOME DO ARQUIVO
-        $nomeArq = 'CB' . date('dmy').date("hi").'.REM';
+        $nomeArq = 'CB' . date('dmy').'.RET';
 
         $retornoBradesco = fopen($nomeArq, 'w');
         //ESCREVE NO ARQUIVO
@@ -261,6 +280,14 @@ class TradutorRetorno extends Controller
         $retorno['retornoBradesco'] = asset($nomeArq);
         $retorno['dataGerado'] = date('d/m/y');
         $retorno['horaGerado'] = date('h:i:sa');
+
+        $historicoRetorno = new historicoRetorno();
+
+        $historicoRetorno->dataTraducao = date('y-m-d H:i:s');
+        $historicoRetorno->autor = session()->get('nome');
+        $historicoRetorno->nomeRetorno =  $nomeArq;
+        $historicoRetorno->save();
+        $retorno['historico'] = $historicoRetorno;
         return redirect()->route('retorno', $retorno);
         //FIM TRAILER
     }

@@ -11,8 +11,7 @@ class LoginContoller extends Controller
 {
     public function index($erro = null)
     {
-            return view('login');
-
+        return view('login');
     }
 
 
@@ -30,7 +29,7 @@ class LoginContoller extends Controller
         }
         $credenciais = $credenciais[0];
         //dd($credenciais);
-        if ($credenciais['grupo_users_id'] == 9 || $credenciais['grupo_users_id'] == 1) {
+        if ($credenciais['grupo_users_id'] == 2 || $credenciais['grupo_users_id'] == 1 || $credenciais['grupo_users_id'] == 3) {
             if (password_verify($senha, $credenciais['pass'])) {
 
                 $dados = [
@@ -43,6 +42,9 @@ class LoginContoller extends Controller
 
                 if(Session::get('nome')){
                     //return view('remessa');
+                    if(Session::get('grupo_users_id') != 1){
+                        return redirect()->route('buscarBoleto');
+                    }
                     return redirect()->route('remessa');
                 }else{
                     return redirect()->route('index');

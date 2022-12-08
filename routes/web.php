@@ -33,7 +33,7 @@ Route::get('/boletos/imprimir/{id}',  [Boleto::class, 'emitirBoletoUnitario'])->
 Route::get('/boletos/clientes',  [Boleto::class, 'buscarCliente'])->name('buscarCliente');
 
 
-
+Route::post('/darbaixa', [Boleto::class, 'baixaBoleto'])->name('baixaBoleto');
 
 Route::get('/boletos/massa/buscar',  [Boleto::class, 'boletosEmMassa'])->name('massa');
 Route::get('/boletos/massa',  [Boleto::class, 'boletosMassaView'])->name('massaView');

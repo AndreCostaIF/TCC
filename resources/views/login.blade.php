@@ -13,7 +13,6 @@
 <link rel="stylesheet" href="{{ url('css/style.css') }}">
 
 <body>
-
     <div class="container ">
         <div class="loginHeader mt-5">
             <img src="{{ asset('assets/logo.svg') }}" class="col-6" alt="">
@@ -48,7 +47,7 @@
                         </div>
 
                         <div class="form-floating mt-3 mb-3 text-center">
-                            <button type="submit" class="btn botaoForm border-danger" id="botaoForm">Entrar</button>
+                            <button type="submit" class="btn btn-outline-danger" id="botaoForm">Entrar</button>
                         </div>
                     </form>
                 </div>

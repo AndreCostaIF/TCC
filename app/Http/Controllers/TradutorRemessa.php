@@ -2,44 +2,46 @@
 
 namespace App\Http\Controllers;
 
+include('openboleto/autoloader.php');
+
+use App\Models\historicoRemessa;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use OpenBoleto\Banco\Santander;
 
 class TradutorRemessa extends Controller
 {
 
-    public function erroAutenticado(){
-        if(session()->has('nome')){
+    public function erroAutenticado()
+    {
+        if (session()->has('nome')) {
 
             return false;
-        }else{
+        } else {
             return true;
-
         }
     }
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
 
-        if($this->erroAutenticado()){
+        if ($this->erroAutenticado()) {
             return redirect()->route('index');
-        }else{
-            if($request->get('remessaSantander')){
+        } else {
+            if ($request->get('remessaSantander')) {
+                $remessa['historico'] = historicoRemessa::pegarTodos();
                 $remessa['remessaSantander'] = $request->get('remessaSantander');
                 $remessa['dataGerado'] = $request->get('dataGerado');
                 $remessa['horaGerado'] = $request->get('horaGerado');
                 return view('remessa', $remessa);
-            }else{
-              return view('remessa');
+            } else {
+                $remessa['historico'] = historicoRemessa::pegarTodos();
+                return view('remessa', $remessa);
             }
         }
-
-
-
-
     }
     function traduzir(Request $request)
     {
-        if($this->erroAutenticado()){
+        if ($this->erroAutenticado()) {
             return redirect()->route('index');
         }
 
@@ -82,22 +84,27 @@ class TradutorRemessa extends Controller
 
         //NOME DO ARQUIVO
 
-        $nameArq =  date('dmy').date("hi").'.REM';
+        $nameArq =  date('dmy') . date("hi") . '.REM';
+
         $remessaSantader = fopen($nameArq, 'w');
         fwrite($remessaSantader, $header . "\n");
         $valorTotalTitulos = 0;
-
+        $santoandre = new Santander();
         //Registro movimento
         for ($i = 1; $i < (sizeof($remessaBradesco) - 1); $i++) {
-
             $x = $remessaBradesco[$i];
+            //dd(substr($x, 75, 6));
+
+
+            $santoandre->setSequencial(substr($x, 73, 8));
+
 
             $codigoRegistro = substr($x, 0, 1); //001 - 001 (001)
-            $tipoBeneficiario = "02"; // 002 - 003 (002)
+            $tipoBeneficiario = "02"; // 002 - 003 (002
             $cnpjOuCpf = "07692425000158"; // 004 - 017 (014)
             $codTransmissao = "45430981859601300398"; // 018 - 037 (020)
-            $controleParticipante = "0000000000000000000000" . $i + 100; // 038 - 062 (025)
-            $nossoNumero = substr($x, 73, 8); // 063 - 070 (008)
+            $controleParticipante = substr($x, 37, 25); // 038 - 062 (025)
+            $nossoNumero = completarPosicoes(substr($x, 75, 6) . $santoandre->gerarDigitoVerificadorNossoNumero(), 8, '0'); // 063 - 070 (008)
             $dataSegundoDesc = "000000"; // 071 - 076 (006)
             $branco1espaco = str_pad("", 1, " "); // 077 - 077 (001)
             $infoMulta = "4"; // 078 - 078 (001)
@@ -107,7 +114,7 @@ class TradutorRemessa extends Controller
             $branco4espaco = str_pad("", 4, " "); // 098 - 101 (004)
             $dataCobrancaMulta = "000000"; // 102 - 107 (006)
             $codigoCarteira = "5"; // 108 - 108 (001)
-            $codigoOcorrencia = "01"; // 109 - 110 (002)
+            $codigoOcorrencia = substr($x, 108, 2); // 109 - 110 (002)
             $seuNumero = substr($x, 110, 10); // 111 - 120 (010)
             $dataVencimento = substr($x, 120, 6); // 121 - 126 (006)
             $valorTitulo = substr($x, 126, 13); // 127 - 139 (013)
@@ -145,7 +152,7 @@ class TradutorRemessa extends Controller
 
             }
 
-            $bairro = str_pad("", 12, " ");; // 315 - 326 (014)
+            $bairro = str_pad("", 12, " "); // 315 - 326 (014)
             if (strlen($enderecoSacado) < 40) {
 
                 $completar = 40 - strlen($enderecoSacado);
@@ -247,8 +254,16 @@ class TradutorRemessa extends Controller
         //dd($remessaSantader);
         $remessa['remessaSantander'] = asset($nameArq);
         $remessa['dataGerado'] = date('d/m/y');
-        $remessa['horaGerado'] = date('h:i:sa');
-        return redirect()->route('remessa', $remessa);
+        $remessa['horaGerado'] = date('H:i:sa');
+        $historicoRemessa = new historicoRemessa();
 
+        $historicoRemessa->dataTraducao = date('y-m-d H:i:s');
+        $historicoRemessa->autor = session()->get('nome');
+        $historicoRemessa->nomeRemessa =  $nameArq;
+        $historicoRemessa->save();
+
+        $remessa['historico'] = $historicoRemessa;
+
+        return redirect()->route('remessa', $remessa);
     }
 }

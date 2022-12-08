@@ -9,5 +9,5 @@ class LoginRadius extends Model
 {
     use HasFactory;
     protected $table = 'login_radius';
-    protected $connection = 'mysql2';
+    protected $connection = 'mysql3';
 }

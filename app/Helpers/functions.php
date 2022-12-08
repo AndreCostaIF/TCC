@@ -2,6 +2,7 @@
 
     function formatDateAndTime($value, $format = 'd/m/Y')
     {
+        $value = str_replace('pm', '', $value);
         // Utiliza a classe de Carbon para converter ao formato de data ou hora desejado
         return Carbon\Carbon::parse($value)->format($format);
     }
@@ -52,7 +53,6 @@
         }
     }
 
-
     function completarPosicoes($campo, $posicoes, $complemento)
     {
         //verifica se o valor total de É MAIOR QUE
@@ -67,4 +67,20 @@
 
         return $campo;
     }
+
+    function completarPosicoes2($campo, $posicoes, $complemento)
+    {
+        //verifica se o valor total de É MAIOR QUE
+        if (strlen($campo) < $posicoes) {
+
+            $completar = $posicoes - strlen($campo);
+
+            $campo = $campo . str_pad("", $completar, $complemento);
+        } else if (strlen($campo) > $posicoes) {
+            $campo = substr($campo, 0, $posicoes);
+        }
+
+        return $campo;
+    }
+
 ?>
