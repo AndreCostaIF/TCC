@@ -79,7 +79,8 @@ class TradutorRetorno extends Controller
 
         $retornoSantander2 = file($request->file('arq'));
 
-        if (substr($retornoSantander2[0], 2, 7) == 'RETORNO' && substr($retornoSantander2[0], 2, 9) == 'SANTANDER') {
+        if (substr($retornoSantander2[0], 2, 7) == 'RETORNO' && substr($retornoSantander2[0], 79, 9) == 'SANTANDER') {
+
             //SALVA O ARQUIVO ORIGINAL DO RETORNO E GUARDA O CAMINHO
             $name = $request->file('arq')->store('public/retorno');
             //TROCA O PUBLIC POR STORAGE NA URL
@@ -108,7 +109,7 @@ class TradutorRetorno extends Controller
                 $zeros . $numAviso . $branco266 . $dataCredito . $branco9 . $numSequencialHeader;
 
             //NOME DO ARQUIVO
-            $nomeArq = 'CB' . date('dmy') . '.RET';
+            $nomeArq = 'CB' . $dataGravacao . '.RET';
 
             $retornoBradesco = fopen($nomeArq, 'w');
             //ESCREVE NO ARQUIVO
