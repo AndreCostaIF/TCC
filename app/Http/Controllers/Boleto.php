@@ -78,8 +78,6 @@ class Boleto extends Controller
                     ['fantasia', 'like', $search . '%']
                 ])->orderBy('fantasia', 'asc')->paginate(10);
 
-
-
                 $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=" . $flag . "&campoBusca=" . $search);
             } else {
                 $search = somentoNumeroCpfOuCnpj($search);
@@ -682,5 +680,21 @@ class Boleto extends Controller
 
             return redirect()->back()->with(['success' => 'Baixa realizada com sucesso!']);
         }
+    }
+
+    public function deletarBoleto(Request $request){
+
+        if ($this->erroAutenticado()) {
+            return redirect()->route('index');
+        }
+
+        $boleto = Financeiros::where([
+            ['id', $request->get('idBoleto')]
+        ])->get();
+
+        $boleto[0]->reg_deleted = 1;
+        $boleto[0]->save();
+        //dd($boleto);
+        return redirect()->back()->with('msg', 'Boleto removido com sucesso!');
     }
 }

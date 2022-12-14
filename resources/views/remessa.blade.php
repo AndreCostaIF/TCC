@@ -39,24 +39,32 @@
         </form> --}}
     </div>
 </div>
-@if (isset($remessaSantander))
-<div class="alert alert-success text-center mt-5 alert-dismissible fade show" role="alert">
-    <strong>Arquivo traduzido com sucesso!</strong>
-    <div class="text-center border-top mt-3 border-bottom">
-        <h6 class="title text-danger">Dados da conversão</h6>
-        <p>Gerado em {{ $dataGerado }} às {{ $horaGerado }}</p>
+@if (session()->has('msg'))
+    <div class="d-flex mt-3 justify-content-center">
+        <div class="alert alert-danger border border-danger  alert-dismissible fade show mt-3" role="alert">
+            <strong><i class="bi bi-file-earmark-x"></i> {{ session()->get('msg') }} </strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     </div>
-    <a class="" href="{{ $remessaSantander }}" download>Clique aqui para download! <i
-        class="bi bi-download"></i>
-    </a>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
+@endif
+@if (isset($remessaSantander))
+    <div class="alert alert-success text-center mt-5 alert-dismissible fade show" role="alert">
+        <strong>Arquivo traduzido com sucesso!</strong>
+        <div class="text-center border-top mt-3 border-bottom">
+            <h6 class="title text-danger">Dados da conversão</h6>
+            <p>Gerado em {{ $dataGerado }} às {{ $horaGerado }}</p>
+        </div>
+        <a class="" href="{{ $remessaSantander }}" download>Clique aqui para download! <i
+                class="bi bi-download"></i>
+        </a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 @endif
 
 <div class="mt-5 row">
     <div class="text-center">
-       <span class="fw-bold h4">Historico de remessas</span>
-       <span class="text-danger h4 fw-bold">Santander</span>
+        <span class="fw-bold h4">Historico de remessas</span>
+        <span class="text-danger h4 fw-bold">Santander</span>
     </div>
     <hr>
     @if (isset($historico))
@@ -78,7 +86,7 @@
                     @foreach ($historico as $item)
                         <tr>
                             <th scope="row">{{ $item->id }}</th>
-                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:i:s')  }}</td>
+                            <td>{{ formatDateAndTime($item->dataTraducao, 'd/m/y H:i:s') }}</td>
                             <td>{{ $item->autor }}</td>
                             <td>
                                 <a class="" href="{{ asset($item->nomeRemessa) }}" download>

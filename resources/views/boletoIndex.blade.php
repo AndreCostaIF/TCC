@@ -87,9 +87,17 @@
 @if (isset($cliente))
     @if (isset($boletos))
         <div class="mt-4">
-            <div class=" divSuccessCopy" >
-
+            @if (session()->has('msg'))
+                <div class="d-flex justify-content-center">
+                    <div class="alert alert-info border border-info  alert-dismissible fade show mt-3" role="alert">
+                        <strong>{{ session()->get('msg') }} </strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            @endif
+            <div class=" divSuccessCopy">
             </div>
+
             <table class="table  table-hover">
                 <thead>
                     <tr>
@@ -179,7 +187,8 @@
                                 @if (isset($cliente['cpf']))
                                     <td><a href="#" class="copiar"> {{ formatarCpf($cliente['cpf']) }}</a></td>
                                 @elseif (isset($cliente['cnpj']))
-                                    <td><a href="#" class="copiar">{{ formatarCnpj($cliente['cnpj']) }} </a></td>
+                                    <td><a href="#" class="copiar">{{ formatarCnpj($cliente['cnpj']) }} </a>
+                                    </td>
                                 @endif
                                 <td>{{ $boleto->id }}</td>
                                 <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
@@ -194,6 +203,12 @@
                                             <i class="bi h4 bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu">
+                                            @if (session()->get('grupo_users_id') == 2 || session()->get('grupo_users_id') == 1)
+                                                <a href="http://177.223.83.142/financeiro/fatura/editar/id/{{ $boleto->id }}"
+                                                    class="dropdown-item" type="button" target="_blank">
+                                                    <i class="bi bi-currency-dollar text-success"></i> Dar baixa
+                                                </a>
+                                            @endif
                                             {{-- <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
                                                     data-bs-target="#exampleModal">
@@ -219,17 +234,17 @@
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
-                                            @if (session()->get('grupo_users_id') == 1 || session()->get('grupo_users_id') == 2)
-                                                {{-- <li>
+                                            {{-- @if (session()->get('grupo_users_id') == 1 || session()->get('grupo_users_id') == 2)
+                                                <li>
                                                     @php
                                                         $dado = [
-                                                            'idBoleto'      => $boleto->id,
-                                                            'vencimento'    => formatDateAndTime($boleto->reg_vencimento),
-                                                            'vencimento2'   => $boleto->reg_vencimento,
-                                                            'valor'         => formatNumber($boleto->reg_valor_total),
-                                                            'mes_ref'       => $boleto->mes_referencia,
-                                                            'ano_ref'       => $boleto->ano_referencia,
-                                                            'cliente'       => $cliente['nome'],
+                                                            'idBoleto' => $boleto->id,
+                                                            'vencimento' => formatDateAndTime($boleto->reg_vencimento),
+                                                            'vencimento2' => $boleto->reg_vencimento,
+                                                            'valor' => formatNumber($boleto->reg_valor_total),
+                                                            'mes_ref' => $boleto->mes_referencia,
+                                                            'ano_ref' => $boleto->ano_referencia,
+                                                            'cliente' => $cliente['nome'],
                                                         ];
                                                         $dado = json_encode($dado);
                                                     @endphp
@@ -238,8 +253,8 @@
                                                         onclick="deleteBoleto({{ $dado }})">
                                                         <i class="bi bi-trash3 text-danger"></i> Excluir boleto
                                                     </button>
-                                                </li> --}}
-                                            @endif
+                                                </li>
+                                            @endif --}}
                                         </ul>
                                     </div>
                                 </td>
@@ -282,10 +297,18 @@
                                             <i class="bi h4 bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu">
+                                            @if (session()->get('grupo_users_id') == 2 || session()->get('grupo_users_id') == 1)
+                                                <li>
+                                                    <a href="http://177.223.83.142/financeiro/fatura/editar/id/{{ $boleto->id }}"
+                                                        class="dropdown-item" type="button" target="_blank">
+                                                        <i class="bi bi-currency-dollar text-success"></i> Dar baixa
+                                                    </a>
+                                                </li>
+                                            @endif
                                             <li>
                                                 <a href="https://www.santander.com.br/2-via-boleto" target="_blank"
                                                     class="dropdown-item" type="button">
-                                                    <i class="bi bi-receipt-cutoff text-danger"></i> 2º via
+                                                    <i class="bi bi-receipt-cutoff text-danger"></i> 2ª via
                                                 </a>
                                             </li>
                                             {{-- <li>
@@ -335,8 +358,8 @@
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
-                                            @if (session()->get('grupo_users_id') == 1 || session()->get('grupo_users_id') == 2)
-                                                {{-- <li>
+                                            {{-- @if (session()->get('grupo_users_id') == 1 || session()->get('grupo_users_id') == 2)
+                                                <li>
                                                     @php
                                                         $dado = [
                                                             'idBoleto' => $boleto->id,
@@ -354,17 +377,16 @@
                                                         onclick="deleteBoleto({{ $dado }})">
                                                         <i class="bi bi-trash3 text-danger"></i> Excluir boleto
                                                     </button>
-                                                </li> --}}
-                                            @endif
-
-
+                                                </li>
+                                            @endif --}}
                                         </ul>
                                     </div>
                                 </td>
                                 <td>
                                     <a target="_blank" href="{{ route('imprimirBoleto', [$boleto->id]) }}"
                                         class="" id=""><img src="{{ asset('assets/boleto.png') }}"
-                                            class="imgBoleto" alt=""></a>
+                                            class="imgBoleto" alt="">
+                                    </a>
                                 </td>
 
                             </tr>
@@ -380,9 +402,8 @@
             {{ $boletos->links() }}
         </div>
 
-
         <!-- Modal BAIXA-->
-        <div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -618,10 +639,11 @@
                                         </div>
                                     </div>
                                     <hr>
-                                    <form action="#" method="get">
+                                    <form action="{{ route('deletarBoleto') }}" method="post">
                                         <div class="hiddens">
                                             @csrf
-                                            <input type="hidden" name="idBoleto" value="">
+                                            <input type="hidden" name="idBoleto" id="idBoletoDeletar"
+                                                value="">
                                         </div>
                                         <button href="#" class="btn w-100 btn-danger excluirBoletoButton"
                                             disabled>

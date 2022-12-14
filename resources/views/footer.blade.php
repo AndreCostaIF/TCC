@@ -2,9 +2,6 @@
 
 <footer>
 
-   <div class="text-end">
-    <img src="{{ asset('assets/FIFA World Cup Qatar 2022 Logo-01.svg') }}" alt="" width="115px" height="115px">
-   </div>
     <div class="border-top text-center">
         <small class=""><b> © 2012 - 20{{date('y')}} Intelnet Telecomunicações. Todos os direitos reservados.</b></small>
     </div>

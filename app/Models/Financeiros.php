@@ -10,6 +10,7 @@ class Financeiros extends Model
 {
     use HasFactory;
     protected $table = 'financeiros';
+    public $timestamps = false;
 
     public static function valoresExtra($idBoleto)
     {

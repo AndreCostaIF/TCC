@@ -37,6 +37,14 @@
         </form> --}}
     </div>
 </div>
+@if (session()->has('msg'))
+    <div class="d-flex mt-3 justify-content-center">
+        <div class="alert alert-danger border border-danger  alert-dismissible fade show mt-3" role="alert">
+            <strong><i class="bi bi-file-earmark-x"></i> {{ session()->get('msg') }} </strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+@endif
 @if(isset($retornoBradesco))
 <div class="alert alert-success text-center mt-5 alert-dismissible fade show" role="alert">
     <strong>Arquivo traduzido com sucesso!</strong>
