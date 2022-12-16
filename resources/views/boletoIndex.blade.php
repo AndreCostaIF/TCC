@@ -156,6 +156,7 @@
                                                 $dado = [
                                                     'desconto' => $boleto->desconto,
                                                     'acrescimo' => $boleto->acrescimo,
+                                                    'descricao' => explode("\n", $boleto->descricao)
                                                 ];
                                                 $dado = json_encode($dado);
                                             @endphp
@@ -225,6 +226,7 @@
                                                 $dado = [
                                                     'desconto' => $boleto->desconto,
                                                     'acrescimo' => $boleto->acrescimo,
+                                                    'descricao' => explode("\n", $boleto->descricao)
                                                 ];
                                                 $dado = json_encode($dado);
                                             @endphp
@@ -349,6 +351,7 @@
                                                 $dado = [
                                                     'desconto' => $boleto->desconto,
                                                     'acrescimo' => $boleto->acrescimo,
+                                                    'descricao' => explode("\n", $boleto->descricao)
                                                 ];
                                                 $dado = json_encode($dado);
                                             @endphp
@@ -552,6 +555,13 @@
                             aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <div class="text-center mensalidade mb-3"></div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold d-flex align-items-center">Contrato:</span>
+                            <span class="contrato"></span>
+                        </div>
+                        <hr>
                         <div class="">
                             <div class="BoxDesconto mb-3" style="display: none">
                                 <div class="h5 text-primary text-center border-bottom">Descontos <i

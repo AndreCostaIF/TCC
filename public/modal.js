@@ -1,5 +1,19 @@
 function info(dado) {
-    console.log(dado)
+    //console.log(dado)
+
+    if(dado.descricao.length <= 2){
+        $('.contrato').html(dado.descricao[0])
+        $('.mensalidade').html(dado.descricao[1])
+    }else{
+        dado.descricao.forEach(element => {
+
+        if(element[0] == 'N'){
+            $('.contrato').append(element + '<br>')
+        }else if(element[0] != 'N'){
+            $('.mensalidade').html(element)
+        }
+       });
+    }
     if (dado.desconto > 0) {
         $('.BoxDesconto').show()
         $('.descontoValor').html("-R$" + dado.desconto)

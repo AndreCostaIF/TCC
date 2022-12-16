@@ -52,7 +52,7 @@ class TradutorRemessa extends Controller
         date_default_timezone_set("America/Sao_Paulo");
         $remessaBradesco2 = file($request->file('arq'));
 
-        if (substr($remessaBradesco2[0], 2, 7) == 'REMESSA' && substr($remessaBradesco2[0], 2, 7) == 'BRADESCO') {
+        if (substr($remessaBradesco2[0], 2, 7) == 'REMESSA' && substr($remessaBradesco2[0], 79, 8) == 'BRADESCO') {
             $name = $request->file('arq')->store('public/remessa');
             $name = str_replace('public', 'storage', $name);
 
