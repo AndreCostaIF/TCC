@@ -5,5 +5,6 @@
     "/bootstrap/bootstrap.js": "/bootstrap/bootstrap.js",
     "/form.js": "/form.js",
     "/modal.js": "/modal.js",
-    "/copy.js": "/copy.js"
+    "/copy.js": "/copy.js",
+    "/contrato.js": "/contrato.js"
 }

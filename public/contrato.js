@@ -1,0 +1,1 @@
+function contrato(a){a.descricao.length<=2?($(".contrato").html(a.descricao[0]),$(".mensalidade").html(a.descricao[1])):a.descricao.forEach((a=>{"N"==a[0]?$(".contrato").append(a+"<br>"):"N"!=a[0]&&$(".mensalidade").html(a)}))}

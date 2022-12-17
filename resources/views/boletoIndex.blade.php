@@ -162,7 +162,7 @@
                                             @endphp
                                             <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#maisInfo" onclick="info({{ $dado }})">
+                                                    data-bs-target="#maisInfo" onclick="(info({{ $dado }}), contrato({{$dado}}))">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
@@ -232,7 +232,7 @@
                                             @endphp
                                             <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#maisInfo" onclick="info({{ $dado }})">
+                                                    data-bs-target="#maisInfo" onclick="(info({{ $dado }}), contrato({{$dado}}))">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
@@ -357,7 +357,7 @@
                                             @endphp
                                             <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#maisInfo" onclick="info({{ $dado }})">
+                                                    data-bs-target="#maisInfo" onclick="(info({{ $dado }}), contrato({{$dado}}))">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
