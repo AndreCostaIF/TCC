@@ -130,17 +130,18 @@ class Boleto extends Controller
 
             foreach ($financeiro as $item) {
 
+                if ($item->reg_deleted != 1) {
+                    $valorExtra = Financeiros::valoresExtra($item['id']);
+                    $descontoBoleto =  $valorExtra['desconto'];
+                    $acrescimoBoleto =  $valorExtra['acrescimo'];
 
-                $valorExtra = Financeiros::valoresExtra($item['id']);
-                $descontoBoleto =  $valorExtra['desconto'];
-                $acrescimoBoleto =  $valorExtra['acrescimo'];
+                    $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
+                    //dd($item);
 
-                $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
-
-
-                $item->desconto = $descontoBoleto;
-                $item->acrescimo = $acrescimoBoleto;
-                $item->linhaDigitavel = $this->pegarLinhaDigitavel($item['id']);
+                    $item->desconto = $descontoBoleto;
+                    $item->acrescimo = $acrescimoBoleto;
+                    $item->linhaDigitavel = $this->pegarLinhaDigitavel($item['id']);
+                }
             }
 
 
@@ -176,7 +177,7 @@ class Boleto extends Controller
 
             foreach ($financeiro as $item) {
 
-
+                if ($item->reg_deleted != 1) {
                 $valorExtra = Financeiros::valoresExtra($item['id']);
                 $descontoBoleto =  $valorExtra['desconto'];
                 $acrescimoBoleto =  $valorExtra['acrescimo'];
@@ -186,7 +187,9 @@ class Boleto extends Controller
 
                 $item->desconto = $descontoBoleto;
                 $item->acrescimo = $acrescimoBoleto;
+
                 $item->linhaDigitavel = $this->pegarLinhaDigitavel($item['id']);
+                }
             }
 
             $pessoaJuridica['nome'] = $pessoaJuridica['fantasia'];
@@ -248,8 +251,8 @@ class Boleto extends Controller
             $valorExtra = Financeiros::valoresExtra($boleto['id']);
             $descontoBoleto =  $valorExtra['desconto'];
             $acrescimoBoleto =  $valorExtra['acrescimo'];
-
             $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
+            //dd($descontoBoleto);
 
 
             $boletoSantander = new Santander(array(
@@ -275,7 +278,7 @@ class Boleto extends Controller
 
             ];
             $boletoSantander->setInstrucoes($arr);
-
+            //dd($boleto);
             return $boletoSantander->getLinhaDigitavel();
         } else {
             $pessoaJuridica =  json_decode(PessoaJuridica::where([
@@ -322,6 +325,7 @@ class Boleto extends Controller
                 'convenio' => 9818596, // 4, 6 ou 7 dígitos
                 'numeroDocumento' => completarPosicoes($boleto['cliente_id_web'] . "", 10, "0")
             ));
+            //dd($boleto);
             return $boletoSantander->getLinhaDigitavel();
         }
     }
@@ -432,8 +436,8 @@ class Boleto extends Controller
             $descontoBoleto =  $valorExtra['desconto'];
             $acrescimoBoleto =  $valorExtra['acrescimo'];
 
-            $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
 
+            $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
 
             $boletoSantander = new Santander(array(
                 // Parâmetros obrigatórios
@@ -489,7 +493,7 @@ class Boleto extends Controller
             ['reg_lancamento', 'like', $search . '%']
         ])->paginate(200);
 
-        foreach($boleto as $item){
+        foreach ($boleto as $item) {
 
             $valorExtra = Financeiros::valoresExtra($item->id);
             $descontoBoleto =  $valorExtra['desconto'];
@@ -682,7 +686,8 @@ class Boleto extends Controller
         }
     }
 
-    public function deletarBoleto(Request $request){
+    public function deletarBoleto(Request $request)
+    {
 
         if ($this->erroAutenticado()) {
             return redirect()->route('index');
