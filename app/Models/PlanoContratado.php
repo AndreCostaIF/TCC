@@ -9,4 +9,5 @@ class PlanoContratado extends Model
 {
     use HasFactory;
     protected $table = 'plano_contratado';
+    public $timestamps = false;
 }

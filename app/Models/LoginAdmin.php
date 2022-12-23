@@ -10,4 +10,5 @@ class LoginAdmin extends Model
     use HasFactory;
     protected $table = 'login';
     protected $connection = 'mysql3';
+    public $timestamps = false;
 }

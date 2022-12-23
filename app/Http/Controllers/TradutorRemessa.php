@@ -95,7 +95,7 @@ class TradutorRemessa extends Controller
             $x = $remessaBradesco[$i];
             //dd(substr($x, 75, 6));
 
-
+ 
             $santoandre->setSequencial(substr($x, 73, 8));
 
 

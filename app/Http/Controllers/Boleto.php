@@ -14,6 +14,7 @@ use App\Models\LoginAdmin;
 use App\Models\LoginRadius;
 use App\Models\PessoaJuridica;
 use App\Models\PlanoContratado;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use DateTime;
 
@@ -31,7 +32,8 @@ class Boleto extends Controller
             return true;
         }
     }
-    public function index()
+
+    public function index($data = null)
     {
         if ($this->erroAutenticado()) {
             return redirect()->route('index');
@@ -689,7 +691,7 @@ class Boleto extends Controller
 
         $cliente = Clientes::find($idCliente);
 
-        if($cliente->status_id != 14){
+        if($cliente->status_id == 2){
             return redirect()->back()->with('erro', "Cliente já está liberado");
         }else{
             $dataAtual = date('Y-m-d');
@@ -700,46 +702,174 @@ class Boleto extends Controller
                 ['mensalidade', 1],
                 ['reg_deleted', 0],
                 ['reg_baixa', 0],
-                ['reg_vencimento', '<', $dataAtual],
-                ['DATEDIFF(NOW(), reg_vencimento)', '>', $intervaloBloqueio]
+                ['reg_vencimento', '<', $dataAtual]
+
             ])
             ->orWhere([
                 ['cliente_id_web', $cliente->id],
                 ['reg_historico', 'like', 'MENSALIDADE'.'%'],
                 ['reg_deleted', 0],
                 ['reg_baixa', 0],
-                ['reg_vencimento', '<', $dataAtual],
-                ['DATEDIFF(NOW(), reg_vencimento)', '>', $intervaloBloqueio]
-            ])->orderBy('reg_vencimento', 'ASC')->paginate(1);
+                ['reg_vencimento', '<', $dataAtual]
 
+            ])
+            ->orderBy('reg_vencimento', 'asc')->paginate(1);
 
-            if($financeiro->total()){
+            if($financeiro->total() == 0){
+
 
                 $cliente->status_id = 2;
 
-                $planosContratado = PlanoContratado::where([
-                    ['clientes_id', $cliente->id],
-                    ['status_id', 19]
-                ])->get();
-
-
-                foreach($planosContratado as $plano){
-
-                    $plano->status_id = 20;
-
-                    $adminLogin = LoginAdmin::find($plano->login_radius_id);
-                    $adminLogin->enable = 1;
-
-                    $loginRadius = LoginRadius::where([
-                        ['username', $adminLogin->username]
+                    $planosContratado = PlanoContratado::where([
+                        ['clientes_id', $cliente->id],
+                        ['status_id', 19]
                     ])->get();
 
-                    $loginRadius->enable = 1;
-                    $loginRadius->value = "Accept";
-                    //verificar como funciona essa questão do radius
 
-                }
-             }
+
+                    foreach($planosContratado as $plano){
+
+                        $plano->status_id = 20;
+
+                        $adminLogin = LoginAdmin::find($plano->login_radius_id);
+                        $adminLogin->enable = 1;
+
+                        $loginRadius1 = LoginRadius::where([
+                            ['username', $adminLogin->username]
+                        ])->first();
+
+
+
+                        if($loginRadius1 != null){
+                            $loginRadius1->enable = 1;
+                            $loginRadius1->save();
+                        }
+
+                        //verificar como funciona essa questão do radius
+                        $loginRadius = LoginRadius::where([
+                            ['login_id', $adminLogin->id],
+                            ['attribute', 'Auth-Type']
+                        ])->first();
+
+                        if($loginRadius != null){
+
+                            $loginRadius->value = 'Accept';
+                            $loginRadius->save();
+                        }
+
+
+
+                        $plano->save();
+                        $adminLogin->save();
+                    }
+
+            }
         }
     }
+
+    public function liberarPlanoPendencia($idCliente){
+
+        $cliente = Clientes::find($idCliente);
+
+        $planosContratado = PlanoContratado::where([
+            ['clientes_id', $idCliente],
+            ['status_id', 19]
+        ])
+        ->orWhere([
+            ['clientes_id', $idCliente],
+            ['status_id', 14]
+        ])
+        ->get();
+
+        $dataAtual = date('Y-m-d');
+
+        foreach($planosContratado as $plano){
+
+            $intervaloBloqueio  = is_null($plano->bloqueio_intervalo) ?
+                $cliente->bloqueio_intervalo : $plano->bloqueio_intervalo;
+
+            $financeiro = Financeiros::where([
+                ['plano_contratado_id', $plano->id],
+                ['mensalidade', 1],
+                ['reg_deleted', 0],
+                ['reg_baixa', 0],
+                ['reg_vencimento', '<', $dataAtual]
+
+            ])
+            ->orderBy('reg_vencimento', 'asc')->paginate(1);
+
+            if($financeiro->total() == 0){
+                $plano->status_id = 20;
+
+                $adminLogin = LoginAdmin::find($plano->login_radius_id);
+
+                $adminLogin->enable = 1;
+
+                $loginRadius1 = LoginRadius::where([
+                    ['username', $adminLogin->username]
+                ])->first();
+
+
+
+                if($loginRadius1 != null){
+                    $loginRadius1->enable = 1;
+                    $loginRadius1->save();
+                }
+
+                //verificar como funciona essa questão do radius
+                $loginRadius = LoginRadius::where([
+                    ['login_id', $adminLogin->id],
+                    ['attribute', 'Auth-Type']
+                ])->first();
+
+                if($loginRadius != null){
+
+                    $loginRadius->value = 'Accept';
+                    $loginRadius->save();
+                }
+
+                $plano->save();
+                $adminLogin->save();
+            }
+
+
+
+
+
+
+        }
+
+        $verificarPlanoContratado = PlanoContratado::where([
+            ['clientes_id', $idCliente],
+            ['status_id', 19]
+        ])->
+        orWhere([
+            ['clientes_id', $idCliente],
+            ['status_id', 14]
+        ])
+        ->get();
+
+        if($verificarPlanoContratado->total() == 0 && $cliente->status_id != 1){
+            $cliente->status_id = 20;
+            $this->atualizaConfigPadraoCliente($cliente->id);
+        }
+    }
+
+    public function atualizaConfigPadraoPlano($id){
+
+        $plano = PlanoContratado::find($id);
+        $plano->num_liberacao_temporaria = 0;
+        $plano->bloqueio_intervalo = 15;
+        $plano->save();
+
+    }
+
+    public function atualizaConfigPadraoCliente($id){
+        $cliente = Clientes::find($id);
+        $cliente->num_liberacao_temporaria = 0;
+        $cliente->bloqueio_intervalo = 15;
+        $cliente->data_bloqueio = null;
+        $cliente->save();
+    }
+
 }
