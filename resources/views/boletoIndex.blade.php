@@ -469,7 +469,7 @@
                                     <option selected>Open this select menu</option>
                                     <option value="20{{ date('y') }}">20{{ date('y') }}</option>
                                     <option value="20{{ date('y') - 1 }}">20{{ date('y') - 1 }}</option>
-                                    <option value="20{{ date('y') - 1 }}">20{{ date('y') - 2 }}</option>
+                                    <option value="20{{ date('y') - 2 }}">20{{ date('y') - 2 }}</option>
                                 </select>
                                 <div>
                                     @error('ano_referencia')

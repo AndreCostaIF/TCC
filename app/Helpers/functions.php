@@ -68,4 +68,12 @@
         return $campo;
     }
 
+    function letraAleatoria(){
+        $letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $letras = str_shuffle($letras);
+        $indice = rand(0, 25);
+        return $letras[$indice];
+    }
+
+
 ?>

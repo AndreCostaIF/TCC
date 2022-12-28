@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 include('openboleto/autoloader.php');
 
+use App\Models\Cidades;
 use App\Models\historicoRemessa;
 use Illuminate\Http\Request;
 use OpenBoleto\Banco\Santander;
@@ -181,16 +182,20 @@ class TradutorRemessa extends Controller
                 $municipio = ""; // 335 - 349 (015)
                 $ufSacado = ""; // 350 - 351 (002)
                 if ($cepCompleto != '59215000') {
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-                    curl_setopt($ch, CURLOPT_URL, "viacep.com.br/ws/$cepCompleto/json/");
 
-                    // Receive server response ...
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+                    // $ch = curl_init();
+                    // curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+                    // curl_setopt($ch, CURLOPT_URL, "viacep.com.br/ws/$cepCompleto/json/");
+
+                    // // Receive server response ...
+                    // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                     //Json para Array
-                    $resultado = json_decode(curl_exec($ch), true);
-                    $municipio = strtoupper($resultado['localidade']); // 335 - 349 (015)
-                    $ufSacado =  strtoupper($resultado['uf']); // 350 - 351 (002)
+                    // $resultado = json_decode(curl_exec($ch), true);
+
+                    $resultado =  Cidades::buscarCidade($cepCompleto);
+                    $municipio = strtoupper($resultado->cidade); // 335 - 349 (015)
+                    $ufSacado =  strtoupper($resultado->sigla); // 350 - 351 (002)
 
                 } else {
                     $municipio = 'NOVA CRUZ'; // 335 - 349 (015)

@@ -49,6 +49,7 @@ class TradutorRetorno extends Controller
 
     public function index(Request $request)
     {
+
         if ($this->erroAutenticado()) {
             return redirect()->route('index');
         }
@@ -109,7 +110,7 @@ class TradutorRetorno extends Controller
                 $zeros . $numAviso . $branco266 . $dataCredito . $branco9 . $numSequencialHeader;
 
             //NOME DO ARQUIVO
-            $nomeArq = 'CB' . $dataGravacao . '.RET';
+            $nomeArq = 'CB' . substr($dataGravacao, 0, 5). letraAleatoria() . '.RET';
 
             $retornoBradesco = fopen($nomeArq, 'w');
             //ESCREVE NO ARQUIVO
