@@ -1,1 +1,15 @@
-function contrato(a){a.descricao.length<=2?($(".contrato").html(a.descricao[0]),$(".mensalidade").html(a.descricao[1])):a.descricao.forEach((a=>{"N"==a[0]?$(".contrato").append(a+"<br>"):"N"!=a[0]&&$(".mensalidade").html(a)}))}
+function contrato(dado){
+    if(dado.descricao.length <= 2){
+        $('.contrato').html(dado.descricao[0])
+        $('.mensalidade').html(dado.descricao[1])
+    }else{
+        dado.descricao.forEach(element => {
+
+        if(element[0] == 'N'){
+            $('.contrato').append(element + '<br>')
+        }else if(element[0] != 'N'){
+            $('.mensalidade').html(element)
+        }
+       });
+    }
+}

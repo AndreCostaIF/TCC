@@ -42,6 +42,12 @@
                             boleto
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('buscarBoleto') }}">
+                            <img src="{{ asset('assets/icone-pix.svg') }}" alt="" width="25" height="25"> área PIX
+                        </a>
+                    </li>
                 </ul>
             </div>
 

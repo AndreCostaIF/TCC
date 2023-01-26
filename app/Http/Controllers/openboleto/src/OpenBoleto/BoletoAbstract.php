@@ -743,6 +743,11 @@ abstract class BoletoAbstract
         return $this->descricaoDemonstrativo;
     }
 
+    public function setQrCode($image){
+
+
+
+    }
     /**
      * Define o local de pagamento do boleto
      *
@@ -1468,6 +1473,7 @@ abstract class BoletoAbstract
         '<div class="black thin"></div>' .
         '</div>';
     }
+
 
     /**
     * Retorna os dados do boleto em um array para ser usado externamente

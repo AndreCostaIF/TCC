@@ -10,12 +10,19 @@ use OpenBoleto\Agente;
 use OpenBoleto\Banco\Santander;
 use App\Models\Clientes;
 use App\Models\Financeiros;
+use App\Models\LoginAdmin;
+use App\Models\LoginRadius;
 use App\Models\PessoaJuridica;
+use App\Models\PlanoContratado;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use DateTime;
 
 
 use Illuminate\Http\Request;
+use Mpdf\QrCode\QrCode;
+use Mpdf\QrCode\OutPut;
+use Pix;
 
 class Boleto extends Controller
 {
@@ -28,6 +35,50 @@ class Boleto extends Controller
             return true;
         }
     }
+
+    private function gerarToken()
+    {
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://pix.santander.com.br/sandbox/oauth/token?grant_type=client_credentials");
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt(
+            $ch,
+            CURLOPT_POSTFIELDS,
+            "client_id=18AxUqXJBuZlRA1FgWc8AeqnTrdgbhGY&client_secret=DSUGlKJk4EAawDGh"
+        );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
+
+
+        // receive server response ...
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $server_output = curl_exec($ch);
+
+        curl_close($ch);
+        //  dd(json_decode($server_output), true);
+        $server_output = json_decode($server_output, true);
+        return $server_output['access_token'];
+    }
+
+    public function buscarCobranca()
+    {
+        $authorization = "Authorization: Bearer " . $this->gerarToken();
+        //dd($authorization);
+        $txid = "cd1fe328-c875-4812-85a6-f233ae41b662";
+        $url = "https://pix.santander.com.br/api/v1/sandbox/cob/$txid";
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($result);
+    }
+
     public function index($data = null)
     {
         if ($this->erroAutenticado()) {
@@ -51,7 +102,7 @@ class Boleto extends Controller
         $search =  $request->get('campoBusca');
         $flag = $request->get('flag');
 
-        //dd($flag);
+
 
 
         if ($flag == "nome" || $flag == "cpf") {
@@ -75,8 +126,8 @@ class Boleto extends Controller
         } elseif ($flag == "fantasia" || $flag == "cnpj") {
             if ($flag == "fantasia") {
                 $pessoaJuridica =  PessoaJuridica::where([
-                    ['fantasia', 'like', $search . '%']
-                ])->orderBy('fantasia', 'asc')->paginate(10);
+                    ['fantasia', 'like', '%' . $search . '%']
+                ])->orderBy('nome', 'asc')->paginate(10);
 
                 $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=" . $flag . "&campoBusca=" . $search);
             } else {
@@ -330,6 +381,28 @@ class Boleto extends Controller
         }
     }
 
+    public function gerarQrCode()
+    {
+
+
+        $cobranca = $this->buscarCobranca();
+        $payload = (new Pix)->setChavePix($cobranca->location)
+            ->setDescricao('Teste pix')
+            ->setNomeTitular('Intelnet Telecom')
+            ->setCidadeTitular('Nova Cruz')
+            ->setTxid($cobranca->txid)
+            ->setValor(doubleval($cobranca->valor->original));
+
+
+        $stringPayload = $payload->gerarPayload();
+
+        $qrCode = new QrCode($stringPayload);
+
+        $image =  (new OutPut\Png)->output($qrCode, 100);
+
+        return $image;
+    }
+
     public function emitirBoletoUnitario($id = null)
     {
         if ($this->erroAutenticado()) {
@@ -383,6 +456,8 @@ class Boleto extends Controller
             $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
 
 
+            $image = $this->gerarQrCode();
+            $image = base64_encode($image);
             $boletoSantander = new Santander(array(
                 // Parâmetros obrigatórios
 
@@ -395,19 +470,33 @@ class Boleto extends Controller
                 'carteira' => 101,
                 'conta' => 1300398, // Até 8 dígitos
                 'convenio' => 9818596, // 4, 6 ou 7 dígitos
-                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web'] . "", 10, "0")
+                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web'] . "", 10, "0"),
+
             ));
 
             $msg = str_replace("\n", "<br>", $boleto['descricao']);
 
+
+
+            //dd(base64_encode($image));
+
+
             $arr = [
+                'pix'=>"<img width=100 height=100 src='data:image/png;base64, $image'>",
                 0 => 'Pagar antes da data do vencimento',
-                1 => $msg
+                1 => $msg,
+
+
+
+
 
             ];
+
             $boletoSantander->setInstrucoes($arr);
 
             echo $boletoSantander->getOutput();
+
+
         } else {
             $pessoaJuridica =  json_decode(PessoaJuridica::where([
                 ['id', $cliente['pessoa_juridica_id']]
@@ -492,6 +581,15 @@ class Boleto extends Controller
             ->where('financeiros.reg_lancamento', 'like', $search . '%')
             ->get();
 
+
+
+        $boletos = DB::table('financeiros')
+            ->join('clientes', 'financeiros.cliente_id_web', '=', 'clientes.id')
+            ->select('clientes.tipo', 'clientes.pessoa_fisica_id', 'clientes.pessoa_juridica_id',  'financeiros.*')
+            ->where('financeiros.reg_lancamento', 'like', $search . '%')
+            ->get();
+
+        $arr = [];
         foreach ($boletos as $item) {
 
             if ($item->tipo == 'F') {
@@ -531,14 +629,14 @@ class Boleto extends Controller
             }
         }
 
-        $boleto = paginate($boletos->sortBy('cidade'), 200);
-
+        $boleto = paginate($boletos->sortBy('cidade'), 20);
 
 
 
         $boleto->withPath("/boletos/massa/buscar?data=" . $search);
         $dados["boletos"] = $boleto;
         $dados['data'] = $search;
+
 
         //dd($dados["boletos"]);
         return view('massa', $dados);
@@ -550,6 +648,7 @@ class Boleto extends Controller
         if ($this->erroAutenticado()) {
             return redirect()->route('index');
         }
+
 
         $boletoID = explode(',', $request->get('imprimirTodos'));
 
@@ -683,56 +782,212 @@ class Boleto extends Controller
     public function baixaBoleto(Request $request)
     {
 
-        if ($this->erroAutenticado()) {
-            return redirect()->route('index');
-        }
-
         $validated = $request->validate([
-            'idBoleto' => 'required',
-            'valor_pago' => 'required',
+            'id' => 'required|integer',
+            'valor_pago' => 'required|numeric',
             'vencimento' => 'required',
             'mes_referencia' => 'required',
             'ano_referencia' => 'required',
-            'reg_valor' => 'required',
-            'mensalidade' => 'required',
-            'tipo_bx' => 'required'
+            'reg_valor' => 'required|numeric',
+            'mensalidade' => 'required|integer'
         ]);
 
-        if (intval($request->get('valor_pago')) > 0) {
-            $id = $request->get('id');
+        $id = $request->get('id');
 
-            $boleto = Financeiros::find($id);
+        $boleto = Financeiros::find($id);
 
-            $boleto->reg_baixa = 2;
-            $boleto->bx_valor_pago = $request->get('valor_pago');
-            $boleto->bx_pagamento = date('Y-m-d ');
-            $boleto->reg_vencimento = $request->get('vencimento');
-            $boleto->mes_referencia = $request->get('mes_referencia');
-            $boleto->ano_referencia = $request->get('ano_referencia');
-            $boleto->reg_valor = $request->get('reg_valor');
-            $boleto->mensalidade = $request->get('mensalidade');
+        $boleto->reg_baixa = 2;
+        $boleto->bx_valor_pago = $request->get('valor_pago');
+        $boleto->bx_pagamento = date('Y-m-d ');
+        $boleto->reg_vencimento = $request->get('vencimento');
+        $boleto->mes_referencia = $request->get('mes_referencia');
+        $boleto->ano_referencia = $request->get('ano_referencia');
+        $boleto->reg_valor = $request->get('reg_valor');
+        $boleto->mensalidade = $request->get('mensalidade');
 
-            $boleto->timestamps = false;
-            $boleto->save();
+        $boleto->timestamps = false;
+        $boleto->save();
 
-            return redirect()->back()->with(['success' => 'Baixa realizada com sucesso!']);
+        return redirect()->back()->with(['success' => 'Baixa realizada com sucesso!']);
+    }
+
+    public function liberarCliente($idCliente)
+    {
+
+        $cliente = Clientes::find($idCliente);
+
+        if ($cliente->status_id == 2) {
+            return redirect()->back()->with('erro', "Cliente já está liberado");
+        } else {
+            $dataAtual = date('Y-m-d');
+            $intervaloBloqueio = $cliente->bloqueio_intervalo;
+
+            $financeiro = Financeiros::where([
+                ['cliente_id_web', $cliente->id],
+                ['mensalidade', 1],
+                ['reg_deleted', 0],
+                ['reg_baixa', 0],
+                ['reg_vencimento', '<', $dataAtual]
+
+            ])
+                ->orWhere([
+                    ['cliente_id_web', $cliente->id],
+                    ['reg_historico', 'like', 'MENSALIDADE' . '%'],
+                    ['reg_deleted', 0],
+                    ['reg_baixa', 0],
+                    ['reg_vencimento', '<', $dataAtual]
+
+                ])
+                ->orderBy('reg_vencimento', 'asc')->paginate(1);
+
+            if ($financeiro->total() == 0) {
+
+
+                $cliente->status_id = 2;
+
+                $planosContratado = PlanoContratado::where([
+                    ['clientes_id', $cliente->id],
+                    ['status_id', 19]
+                ])->get();
+
+
+
+                foreach ($planosContratado as $plano) {
+
+                    $plano->status_id = 20;
+
+                    $adminLogin = LoginAdmin::find($plano->login_radius_id);
+                    $adminLogin->enable = 1;
+
+                    $loginRadius1 = LoginRadius::where([
+                        ['username', $adminLogin->username]
+                    ])->first();
+
+
+
+                    if ($loginRadius1 != null) {
+                        $loginRadius1->enable = 1;
+                        $loginRadius1->save();
+                    }
+
+                    //verificar como funciona essa questão do radius
+                    $loginRadius = LoginRadius::where([
+                        ['login_id', $adminLogin->id],
+                        ['attribute', 'Auth-Type']
+                    ])->first();
+
+                    if ($loginRadius != null) {
+
+                        $loginRadius->value = 'Accept';
+                        $loginRadius->save();
+                    }
+
+
+
+                    $plano->save();
+                    $adminLogin->save();
+                }
+            }
         }
     }
 
-    public function deletarBoleto(Request $request)
+    public function liberarPlanoPendencia($idCliente)
     {
 
-        if ($this->erroAutenticado()) {
-            return redirect()->route('index');
+        $cliente = Clientes::find($idCliente);
+
+        $planosContratado = PlanoContratado::where([
+            ['clientes_id', $idCliente],
+            ['status_id', 19]
+        ])
+            ->orWhere([
+                ['clientes_id', $idCliente],
+                ['status_id', 14]
+            ])
+            ->get();
+
+        $dataAtual = date('Y-m-d');
+
+        foreach ($planosContratado as $plano) {
+
+            $intervaloBloqueio  = is_null($plano->bloqueio_intervalo) ?
+                $cliente->bloqueio_intervalo : $plano->bloqueio_intervalo;
+
+            $financeiro = Financeiros::where([
+                ['plano_contratado_id', $plano->id],
+                ['mensalidade', 1],
+                ['reg_deleted', 0],
+                ['reg_baixa', 0],
+                ['reg_vencimento', '<', $dataAtual]
+
+            ])
+                ->orderBy('reg_vencimento', 'asc')->paginate(1);
+
+            if ($financeiro->total() == 0) {
+                $plano->status_id = 20;
+
+                $adminLogin = LoginAdmin::find($plano->login_radius_id);
+
+                $adminLogin->enable = 1;
+
+                $loginRadius1 = LoginRadius::where([
+                    ['username', $adminLogin->username]
+                ])->first();
+
+
+
+                if ($loginRadius1 != null) {
+                    $loginRadius1->enable = 1;
+                    $loginRadius1->save();
+                }
+
+                //verificar como funciona essa questão do radius
+                $loginRadius = LoginRadius::where([
+                    ['login_id', $adminLogin->id],
+                    ['attribute', 'Auth-Type']
+                ])->first();
+
+                if ($loginRadius != null) {
+
+                    $loginRadius->value = 'Accept';
+                    $loginRadius->save();
+                }
+
+                $plano->save();
+                $adminLogin->save();
+            }
         }
 
-        $boleto = Financeiros::where([
-            ['id', $request->get('idBoleto')]
-        ])->get();
+        $verificarPlanoContratado = PlanoContratado::where([
+            ['clientes_id', $idCliente],
+            ['status_id', 19]
+        ])->orWhere([
+            ['clientes_id', $idCliente],
+            ['status_id', 14]
+        ])
+            ->get();
 
-        $boleto[0]->reg_deleted = 1;
-        $boleto[0]->save();
-        //dd($boleto);
-        return redirect()->back()->with('msg', 'Boleto removido com sucesso!');
+        if ($verificarPlanoContratado->total() == 0 && $cliente->status_id != 1) {
+            $cliente->status_id = 20;
+            $this->atualizaConfigPadraoCliente($cliente->id);
+        }
+    }
+
+    public function atualizaConfigPadraoPlano($id)
+    {
+
+        $plano = PlanoContratado::find($id);
+        $plano->num_liberacao_temporaria = 0;
+        $plano->bloqueio_intervalo = 15;
+        $plano->save();
+    }
+
+    public function atualizaConfigPadraoCliente($id)
+    {
+        $cliente = Clientes::find($id);
+        $cliente->num_liberacao_temporaria = 0;
+        $cliente->bloqueio_intervalo = 15;
+        $cliente->data_bloqueio = null;
+        $cliente->save();
     }
 }

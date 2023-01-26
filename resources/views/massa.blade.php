@@ -55,16 +55,13 @@
                 <tbody>
                     @foreach ($boletos as $boleto)
                         <tr class="boletoPago">
-                            @if (isset($boleto->id))
-
                             <td class="idBoleto">{{ $boleto->id }}</td>
                             <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
                             <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
                             <td>R${{ formatNumber($boleto->reg_valor_total) }}</td>
-                            <td>{{$boleto->cidade }}</td>
-                            @endif
                         </tr>
                     @endforeach
+
                 </tbody>
             </div>
         @endif
@@ -81,5 +78,6 @@
             </div>
         @endif
     @endif
+
 </div>
 @include('footer')

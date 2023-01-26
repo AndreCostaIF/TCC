@@ -156,13 +156,14 @@
                                                 $dado = [
                                                     'desconto' => $boleto->desconto,
                                                     'acrescimo' => $boleto->acrescimo,
-                                                    'descricao' => explode("\n", $boleto->descricao)
+                                                    'descricao' => explode("\n", $boleto->descricao),
                                                 ];
                                                 $dado = json_encode($dado);
                                             @endphp
                                             <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#maisInfo" onclick="(info({{ $dado }}), contrato({{$dado}}))">
+                                                    data-bs-target="#maisInfo"
+                                                    onclick="(info({{ $dado }}), contrato({{ $dado }}))">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
@@ -226,13 +227,14 @@
                                                 $dado = [
                                                     'desconto' => $boleto->desconto,
                                                     'acrescimo' => $boleto->acrescimo,
-                                                    'descricao' => explode("\n", $boleto->descricao)
+                                                    'descricao' => explode("\n", $boleto->descricao),
                                                 ];
                                                 $dado = json_encode($dado);
                                             @endphp
                                             <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#maisInfo" onclick="(info({{ $dado }}), contrato({{$dado}}))">
+                                                    data-bs-target="#maisInfo"
+                                                    onclick="(info({{ $dado }}), contrato({{ $dado }}))">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
@@ -351,13 +353,14 @@
                                                 $dado = [
                                                     'desconto' => $boleto->desconto,
                                                     'acrescimo' => $boleto->acrescimo,
-                                                    'descricao' => explode("\n", $boleto->descricao)
+                                                    'descricao' => explode("\n", $boleto->descricao),
                                                 ];
                                                 $dado = json_encode($dado);
                                             @endphp
                                             <li>
                                                 <button class="dropdown-item" type="button" data-bs-toggle="modal"
-                                                    data-bs-target="#maisInfo" onclick="(info({{ $dado }}), contrato({{$dado}}))">
+                                                    data-bs-target="#maisInfo"
+                                                    onclick="(info({{ $dado }}), contrato({{ $dado }}))">
                                                     <i class="bi bi-info-circle text-info"></i> Mais informações
                                                 </button>
                                             </li>
@@ -386,11 +389,30 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a target="_blank" href="{{ route('imprimirBoleto', [$boleto->id]) }}"
-                                        class="" id=""><img src="{{ asset('assets/boleto.png') }}"
-                                            class="imgBoleto" alt="">
-                                    </a>
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-dark dropdown-toggle" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            Pagamentos
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a target="_blank"
+                                                    href="{{ route('imprimirBoleto', [$boleto->id]) }}"
+                                                    class="dropdown-item" id=""><i class="bi bi-upc-scan"></i> BOLETO
+                                                </a>
+                                            </li>
+                                            <li><a href="#" class="dropdown-item" type="button">
+                                                <img src="{{ asset('assets/icone-pix.svg') }}" class="text-info" width="18" height="18" alt="">
+                                                 BOLETO COM PIX
+                                                </a>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+
                                 </td>
+
+
 
                             </tr>
                         @endif

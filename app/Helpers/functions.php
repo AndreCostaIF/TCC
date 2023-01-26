@@ -72,11 +72,19 @@ use Illuminate\Support\Collection;
         return $campo;
     }
 
-    function letraAleatoria(){
-        $letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $letras = str_shuffle($letras);
-        $indice = rand(0, 25);
-        return $letras[$indice];
+    function completarPosicoes2($campo, $posicoes, $complemento)
+    {
+        //verifica se o valor total de É MAIOR QUE
+        if (strlen($campo) < $posicoes) {
+
+            $completar = $posicoes - strlen($campo);
+
+            $campo = $campo . str_pad("", $completar, $complemento);
+        } else if (strlen($campo) > $posicoes) {
+            $campo = substr($campo, 0, $posicoes);
+        }
+
+        return $campo;
     }
 
     function paginate($items, $perPage = 5, $page = null, $options = [])
@@ -84,6 +92,15 @@ use Illuminate\Support\Collection;
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
         $items = $items instanceof Collection ? $items : Collection::make($items);
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+
     }
+
+    function letraAleatoria(){
+        $letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $letras = str_shuffle($letras);
+        $indice = rand(0, 25);
+        return $letras[$indice];
+    }
+
 
 ?>
