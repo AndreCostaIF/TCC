@@ -178,17 +178,17 @@ class Boleto extends Controller
             foreach ($financeiro as $item) {
 
                 if ($item->reg_deleted != 1) {
-                $valorExtra = Financeiros::valoresExtra($item['id']);
-                $descontoBoleto =  $valorExtra['desconto'];
-                $acrescimoBoleto =  $valorExtra['acrescimo'];
+                    $valorExtra = Financeiros::valoresExtra($item['id']);
+                    $descontoBoleto =  $valorExtra['desconto'];
+                    $acrescimoBoleto =  $valorExtra['acrescimo'];
 
-                $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
+                    $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
 
 
-                $item->desconto = $descontoBoleto;
-                $item->acrescimo = $acrescimoBoleto;
+                    $item->desconto = $descontoBoleto;
+                    $item->acrescimo = $acrescimoBoleto;
 
-                $item->linhaDigitavel = $this->pegarLinhaDigitavel($item['id']);
+                    $item->linhaDigitavel = $this->pegarLinhaDigitavel($item['id']);
                 }
             }
 
@@ -485,22 +485,55 @@ class Boleto extends Controller
         }
 
         $search =  $request->get('data');
-        //dd($search);
 
+        $boletos = DB::table('financeiros')
+            ->join('clientes', 'financeiros.cliente_id_web', '=', 'clientes.id')
+            ->select('clientes.tipo', 'clientes.pessoa_fisica_id', 'clientes.pessoa_juridica_id',  'financeiros.*')
+            ->where('financeiros.reg_lancamento', 'like', $search . '%')
+            ->get();
 
-        //dd($search);
-        $boleto = Financeiros::where([
-            ['reg_lancamento', 'like', $search . '%']
-        ])->paginate(200);
+        foreach ($boletos as $item) {
 
-        foreach ($boleto as $item) {
+            if ($item->tipo == 'F') {
 
-            $valorExtra = Financeiros::valoresExtra($item->id);
-            $descontoBoleto =  $valorExtra['desconto'];
-            $acrescimoBoleto =  $valorExtra['acrescimo'];
+                $cidade = json_decode(DB::table('pessoa_fisica')
+                    ->join('lista_telefonica', 'pessoa_fisica.lista_telefonica_id', '=', 'lista_telefonica.id')
+                    ->join('catalogo_enderecos', 'lista_telefonica.catalogo_enderecos_id', '=', 'catalogo_enderecos.id')
+                    ->join('cidades', 'catalogo_enderecos.cidades_id', '=', 'cidades.id')
+                    ->select('cidades.cidade')
+                    ->where('pessoa_fisica.id', '=', $item->pessoa_fisica_id)
+                    ->get(), true);
 
-            $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
+                $item->cidade = $cidade[0]['cidade'];
+
+                $valorExtra = Financeiros::valoresExtra($item->id);
+                $descontoBoleto =  $valorExtra['desconto'];
+                $acrescimoBoleto =  $valorExtra['acrescimo'];
+
+                $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
+            } else {
+
+                $cidade = json_decode(DB::table('pessoa_juridica')
+                    ->join('lista_telefonica', 'pessoa_juridica.lista_telefonica_id', '=', 'lista_telefonica.id')
+                    ->join('catalogo_enderecos', 'lista_telefonica.catalogo_enderecos_id', '=', 'catalogo_enderecos.id')
+                    ->join('cidades', 'catalogo_enderecos.cidades_id', '=', 'cidades.id')
+                    ->select('cidades.cidade')
+                    ->where('pessoa_juridica.id', '=', $item->pessoa_juridica_id)
+                    ->get(), true);
+
+                $item->cidade = $cidade[0]['cidade'];
+
+                $valorExtra = Financeiros::valoresExtra($item->id);
+                $descontoBoleto =  $valorExtra['desconto'];
+                $acrescimoBoleto =  $valorExtra['acrescimo'];
+
+                $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
+            }
         }
+
+        $boleto = paginate($boletos->sortBy('cidade'), 200);
+
+
 
 
         $boleto->withPath("/boletos/massa/buscar?data=" . $search);
@@ -588,7 +621,7 @@ class Boleto extends Controller
                 ];
                 $boletoSantander->setInstrucoes($arr);
 
-                echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
+                echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
             } else {
                 $pessoaJuridica =  json_decode(PessoaJuridica::where([
                     ['id', $cliente['pessoa_juridica_id']]
@@ -642,7 +675,7 @@ class Boleto extends Controller
                 ];
                 $boletoSantander->setInstrucoes($arr);
 
-                echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
+                echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
             }
         }
     }

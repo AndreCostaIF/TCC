@@ -5,6 +5,7 @@ use App\Http\Controllers\TradutorRemessa;
 use App\Http\Controllers\TradutorRetorno;
 use App\Http\Controllers\Boleto;
 use App\Http\Controllers\LoginContoller;
+use App\Http\Controllers\PixController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,3 +40,6 @@ Route::post('/boletos/delete',  [Boleto::class, 'deletarBoleto'])->name('deletar
 Route::get('/boletos/massa/buscar',  [Boleto::class, 'boletosEmMassa'])->name('massa');
 Route::get('/boletos/massa',  [Boleto::class, 'boletosMassaView'])->name('massaView');
 Route::post('/boletos/imprimirMassa',  [Boleto::class, 'imprimirMassa'])->name('imprimirMassa');
+
+
+Route::get('/gerartoken',  [PixController::class, 'criarCobranca'])->name('gerartoken');

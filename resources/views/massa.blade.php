@@ -30,6 +30,7 @@
                 <th scope="col">Lançamento</th>
                 <th scope="col">Vencimento</th>
                 <th scope="col">Valor a pagar</th>
+                <th scope="col">Cidade</th>
                 <th></th>
             </tr>
         </thead>
@@ -41,7 +42,7 @@
                 <div class=" d-flex justify-content-around">
                     <span> Boletos nesta página: {{ $boletos->count() }}</span>
                     <span> Total do lote: {{ $boletos->total() }}</span>
-                   </div>
+                </div>
                 @if ($boletos->total() > 0)
                     <form action="{{ route('imprimirMassa') }}" method="POST" target="_blank">
                         @csrf
@@ -52,15 +53,18 @@
                     </form>
                 @endif
                 <tbody>
-                    @for ($index = 0; $index < count($boletos); $index++)
-                        {{-- BOLETOS PAGOS --}}
+                    @foreach ($boletos as $boleto)
                         <tr class="boletoPago">
-                            <td class="idBoleto">{{ $boletos[$index]['id'] }}</td>
-                            <td>{{ formatDateAndTime($boletos[$index]['reg_lancamento']) }}</td>
-                            <td>{{ formatDateAndTime($boletos[$index]['reg_vencimento']) }}</td>
-                            <td>R${{ formatNumber($boletos[$index]['reg_valor_total']) }}</td>
+                            @if (isset($boleto->id))
+
+                            <td class="idBoleto">{{ $boleto->id }}</td>
+                            <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
+                            <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
+                            <td>R${{ formatNumber($boleto->reg_valor_total) }}</td>
+                            <td>{{$boleto->cidade }}</td>
+                            @endif
                         </tr>
-                    @endfor
+                    @endforeach
                 </tbody>
             </div>
         @endif
