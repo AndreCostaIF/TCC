@@ -35,6 +35,7 @@ Route::get('/boletos/clientes',  [Boleto::class, 'buscarCliente'])->name('buscar
 
 
 Route::post('/darbaixa', [Boleto::class, 'baixaBoleto'])->name('baixaBoleto');
+Route::post('/boletos/delete',  [Boleto::class, 'deletarBoleto'])->name('deletarBoleto');
 
 Route::get('/liberar/{id}', [Boleto::class, 'liberarCliente'])->name('liberar');
 

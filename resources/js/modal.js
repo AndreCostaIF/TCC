@@ -1,5 +1,7 @@
 function info(dado) {
-    console.log(dado)
+    //console.log(dado)
+
+
     if (dado.desconto > 0) {
         $('.BoxDesconto').show()
         $('.descontoValor').html("-R$" + dado.desconto)
@@ -30,21 +32,19 @@ function deleteBoleto(dado) {
     $('.vencimento').html(dado.vencimento)
     $('.refBoleto').html(dado.mes_ref + "/" + dado.ano_ref)
     $('.valorBoleto').html("R$" + dado.valor)
+    $('#idBoletoDeletar').val(dado.idBoleto)
 }
-
-
 
 $('#botaoDarBaixa').on('click', function () {
     $('#formDarBaixa').submit()
-
 });
-
 
 if ($("#confirmDelete").length) {
     const myModalEl = document.getElementById('deleteBoleto')
     myModalEl.addEventListener('hidden.bs.modal', event => {
         $("#confirmDelete").prop("checked", false);
         $(".excluirBoletoButton").attr("disabled", true);
+        $('#idBoletoDeletar').val('')
     })
 }
 

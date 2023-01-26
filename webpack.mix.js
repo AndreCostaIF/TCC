@@ -18,6 +18,7 @@ mix.scripts(['node_modules/jquery/dist/jquery.js'],
 .scripts('resources/js/form.js', 'public/form.js')
 .scripts('resources/js/modal.js' , 'public/modal.js')
 .scripts('resources/js/copy.js', 'public/copy.js')
+.scripts('resources/js/contract.js', 'public/contrato.js')
 
 mix.sass('node_modules/bootstrap/scss/bootstrap.scss',
 'public/bootstrap/bootstrap.css');

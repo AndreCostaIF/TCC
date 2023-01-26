@@ -92,6 +92,14 @@ use Illuminate\Support\Collection;
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
         $items = $items instanceof Collection ? $items : Collection::make($items);
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+
+    }
+
+    function letraAleatoria(){
+        $letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $letras = str_shuffle($letras);
+        $indice = rand(0, 25);
+        return $letras[$indice];
     }
 
 
