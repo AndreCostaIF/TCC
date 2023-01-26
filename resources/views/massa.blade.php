@@ -5,49 +5,6 @@
 <div class="mt-5 text-center">
     <h3 class="subtitle">buscar boletos</h3>
 </div>
-<<<<<<< HEAD
-
-<div class="col-md-5 mt-3 ">
-    <form action="{{ route('massa') }}" method="GET" class="d-flex justify-content-around align-items-center">
-        @csrf
-
-
-        <div class="form-floating col-md-6">
-            <input type="date" class="form-control" name="data" id="floatingInput"
-                placeholder="name@example.com" required>
-            <label for="floatingInput" id="campoBusca">Informe a data</label>
-        </div>
-
-        <div class="">
-
-            <button type="submit" class="btn botaoForm" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
-        </div>
-
-
-    </form>
-
-    @if (isset($boletos))
-
-
-
-        <div class="mt-5">
-            {{ $boletos->links() }}
-            <form action="{{route('imprimirMassa')}}" method="POST">
-                @csrf
-                <input type="hidden" name="imprimirTodos" class="imprimirTodos" value="">
-                <button type="submit"  class="btn botaoForm "  id="botaoForm"><i class="bi bi-printer"></i> Imprimir todos</button>
-            </form>
-            <table class="table  table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Lançamento</th>
-                        <th scope="col">Vencimento</th>
-                        <th scope="col">Valor a pagar</th>
-                        <th></th>
-                    </tr>
-                </thead>
-=======
 <div class="d-flex justify-content-center ">
     <div class="col-md-5  mt-3">
         <form action="{{ route('massa') }}" method="GET" class="d-flex justify-content-around align-items-center">
@@ -94,28 +51,17 @@
                         </button>
                     </form>
                 @endif
->>>>>>> 6ff4c29710d7363f3da1995f13218822695bae36
                 <tbody>
-                    @for ($index = 0; $index < count($boletos); $index++)
-                        {{-- BOLETOS PAGOS --}}
+                    @foreach ($boletos as $boleto)
                         <tr class="boletoPago">
-                            <td class="idBoleto">{{ $boletos[$index]['id'] }}</td>
-                            <td>{{ formatDateAndTime($boletos[$index]['reg_lancamento']) }}</td>
-                            <td>{{ formatDateAndTime($boletos[$index]['reg_vencimento']) }}</td>
-                            <td>R${{ formatNumber($boletos[$index]['reg_valor_total']) }}</td>
+                            <td class="idBoleto">{{ $boleto->id }}</td>
+                            <td>{{ formatDateAndTime($boleto->reg_lancamento) }}</td>
+                            <td>{{ formatDateAndTime($boleto->reg_vencimento) }}</td>
+                            <td>R${{ formatNumber($boleto->reg_valor_total) }}</td>
                         </tr>
-                    @endfor
+                    @endforeach
+
                 </tbody>
-<<<<<<< HEAD
-            </table>
-
-        </div>
-
-        @if (session('erro'))
-                <div class="alert alert-danger" role="alert">
-                    <i class="bi bi-exclamation-triangle"></i> {{ session('erro') }}
-                </div>
-=======
             </div>
         @endif
     </table>
@@ -129,7 +75,6 @@
                     </div>
                 </div>
             </div>
->>>>>>> 6ff4c29710d7363f3da1995f13218822695bae36
         @endif
     @endif
 

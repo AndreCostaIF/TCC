@@ -32,13 +32,9 @@
         </div>
 
         <div class="">
-<<<<<<< HEAD
-            <button type="submit" class="btn botaoForm" id="botaoForm"><i class="bi bi-search"></i> Buscar</button>
-=======
 
             <button type="submit" class="btn btn-outline-danger" id="botaoForm"><i class="bi bi-search"></i>
                 Buscar</button>
->>>>>>> 6ff4c29710d7363f3da1995f13218822695bae36
         </div>
 
 
