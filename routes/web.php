@@ -30,7 +30,7 @@ Route::post('/traduzirRetorno',  [TradutorRetorno::class, 'traduzirRetorno'])->n
 
 Route::get('/buscarBoleto', [Boleto::class, 'index'])->name('buscarBoleto');
 Route::get('/boletos/busca/{id}/{flag}',  [Boleto::class, 'listarBoletos'])->name('listarBoletos');
-Route::get('/boletos/imprimir/{id}',  [Boleto::class, 'emitirBoletoUnitario'])->name('imprimirBoleto');
+Route::get('/boletos/imprimir/{id}',  [Boleto::class, 'emitirBoletoUnitarioComPix'])->name('imprimirBoleto');
 Route::get('/boletos/clientes',  [Boleto::class, 'buscarCliente'])->name('buscarCliente');
 
 
