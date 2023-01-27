@@ -36,48 +36,6 @@ class Boleto extends Controller
         }
     }
 
-    private function gerarToken()
-    {
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://pix.santander.com.br/sandbox/oauth/token?grant_type=client_credentials");
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt(
-            $ch,
-            CURLOPT_POSTFIELDS,
-            "client_id=18AxUqXJBuZlRA1FgWc8AeqnTrdgbhGY&client_secret=DSUGlKJk4EAawDGh"
-        );
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
-
-
-        // receive server response ...
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $server_output = curl_exec($ch);
-
-        curl_close($ch);
-        //  dd(json_decode($server_output), true);
-        $server_output = json_decode($server_output, true);
-        return $server_output['access_token'];
-    }
-
-    public function buscarCobranca()
-    {
-        $authorization = "Authorization: Bearer " . $this->gerarToken();
-        //dd($authorization);
-        $txid = "cd1fe328-c875-4812-85a6-f233ae41b662";
-        $url = "https://pix.santander.com.br/api/v1/sandbox/cob/$txid";
-        $ch = curl_init($url);
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        $result = curl_exec($ch);
-        curl_close($ch);
-
-        return json_decode($result);
-    }
 
     public function index($data = null)
     {
@@ -127,7 +85,7 @@ class Boleto extends Controller
             if ($flag == "fantasia") {
                 $pessoaJuridica =  PessoaJuridica::where([
                     ['fantasia', 'like', '%' . $search . '%']
-                ])->orderBy('nome', 'asc')->paginate(10);
+                ])->orderBy('fantasia', 'asc')->paginate(10);
 
                 $data['clientesBusca'] = $pessoaJuridica->withPath("/boletos/clientes?flag=" . $flag . "&campoBusca=" . $search);
             } else {
@@ -381,27 +339,6 @@ class Boleto extends Controller
         }
     }
 
-    public function gerarQrCode()
-    {
-
-
-        $cobranca = $this->buscarCobranca();
-        $payload = (new Pix)->setChavePix($cobranca->location)
-            ->setDescricao('Teste pix')
-            ->setNomeTitular('Intelnet Telecom')
-            ->setCidadeTitular('Nova Cruz')
-            ->setTxid($cobranca->txid)
-            ->setValor(doubleval($cobranca->valor->original));
-
-
-        $stringPayload = $payload->gerarPayload();
-
-        $qrCode = new QrCode($stringPayload);
-
-        $image =  (new OutPut\Png)->output($qrCode, 100);
-
-        return $image;
-    }
 
     public function emitirBoletoUnitario($id = null)
     {
@@ -625,18 +562,24 @@ class Boleto extends Controller
 
 
             //dd(base64_encode($image));
-            $image = $this->gerarQrCode();
-            $image = base64_encode($image);
+            $pix = new PixController();
+            if($pix->gerarQrCode($boleto['reg_vencimento'], $pessoaFisica['nome'], $boleto['reg_valor_total'], $msg, $boleto['id'], $pessoaFisica['cpf'],null) != 1){
 
-            $arr = [
-                'pix'=>"<img width=100 height=100 src='data:image/png;base64, $image'>",
-                0 => 'Pagar antes da data do vencimento',
-                1 => $msg,
-            ];
+                $image = base64_encode($pix->gerarQrCode($boleto['reg_vencimento'], $pessoaFisica['nome'], $boleto['reg_valor_total'], $msg, $boleto['id'], $pessoaFisica['cpf'],null));
 
-            $boletoSantander->setInstrucoes($arr);
+                $arr = [
+                    'pix'=>"<img width=100 height=100 src='data:image/png;base64, $image'>",
+                    0 => 'Pagar antes da data do vencimento',
+                    1 => $msg,
+                ];
 
-            echo $boletoSantander->getOutput();
+                $boletoSantander->setInstrucoes($arr);
+
+                echo $boletoSantander->getOutput();
+            }else{
+
+                echo 'pix pago';
+            }
 
 
         } else {
@@ -687,17 +630,24 @@ class Boleto extends Controller
 
             $msg = str_replace("\n", "<br>", $boleto['descricao']);
 
-            $image = $this->gerarQrCode();
-            $image = base64_encode($image);
+            $pix = new PixController();
+            if($pix->gerarQrCode($boleto['reg_vencimento'], $pessoaJuridica['fantasia'], $boleto['reg_valor_total'], $msg, $boleto['id'], null,$pessoaJuridica['cnpj']) != 1){
 
-            $arr = [
-                'pix'=>"<img width=100 height=100 src='data:image/png;base64, $image'>",
-                0 => 'Pagar antes da data do vencimento',
-                1 => $msg,
-            ];
-            $boletoSantander->setInstrucoes($arr);
+                $image = base64_encode($pix->gerarQrCode($boleto['reg_vencimento'], $pessoaJuridica['fantasia'], $boleto['reg_valor_total'], $msg, $boleto['id'], null,$pessoaJuridica['cnpj']));
 
-            echo $boletoSantander->getOutput();
+                $arr = [
+                    'pix'=>"<img width=100 height=100 src='data:image/png;base64, $image'>",
+                    0 => 'Pagar antes da data do vencimento',
+                    1 => $msg,
+                ];
+
+                $boletoSantander->setInstrucoes($arr);
+
+                echo $boletoSantander->getOutput();
+            }else{
+
+                echo 'pix pago';
+            }
         }
     }
 

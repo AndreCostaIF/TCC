@@ -35,11 +35,10 @@ function getValue($id, $value){
 
 function getMerchantAccountInformation($chave_pix, $descricao){
     $gui = getValue(ConstantesPix::ID_MERCHANT_ACCOUNT_INFORMATION_GUI, 'br.gov.bcb.pix');
-    $key = getValue(ConstantesPix::ID_MERCHANT_ACCOUNT_INFORMATION_KEY, $chave_pix);
     $descripcion = strlen($descricao) ? getValue(ConstantesPix::ID_MERCHANT_ACCOUNT_INFORMATION_DESCRIPTION, $descricao) : '';
 
 
-    return getValue(ConstantesPix::ID_MERCHANT_ACCOUNT_INFORMATION, $gui.$key.$descripcion);
+    return getValue(ConstantesPix::ID_MERCHANT_ACCOUNT_INFORMATION, $gui.$descripcion);
 }
 
 function getAdditionalDataFieldTemplate($txid){
@@ -66,4 +65,6 @@ function gerarPayload($chave_pix, $descricao, $nome_titular, $cidade_titular, $t
 
     return $payload.getCRC16($payload);
 }
+
+
 

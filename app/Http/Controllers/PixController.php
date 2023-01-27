@@ -11,30 +11,43 @@ class PixController extends Controller
 {
     //
 
-    public function index(Request $request)
+    public function gerarQrCode($vencimento, $nomeDevedor, $valor, $infoAdicionais, $txid, $cpf = null, $cnpj = null)
     {
 
+        if ($this->buscarCobranca($txid) != []) {
+            $cobranca = $this->buscarCobranca($txid);
+        } else {
 
-        $cobranca = $this->criarCobranca();
-        //dd($cobranca);
-        $payload = (new Pix)->setChavePix($cobranca->location)
-            ->setDescricao('Teste pix')
-            ->setNomeTitular('Intelnet Telecom')
-            ->setCidadeTitular('Nova Cruz')
-            ->setTxid($cobranca->txid)
-            ->setValor(doubleval($cobranca->valor->original));
+            if(isset($cpf)){
 
+                $cobranca = $this->criarCobranca($vencimento, $nomeDevedor, $valor, $infoAdicionais, $txid, $cpf, $cnpj);
+            }else{
+                $cobranca = $this->criarCobranca($vencimento, $nomeDevedor, $valor, $infoAdicionais, $txid, $cpf, $cnpj);
+            }
+        }
 
-        $stringPayload = $payload->gerarPayload();
+        $cobranca->status = 'ATIVA';
+        if ($cobranca->status != 'CONCLUIDA') {
+            $payload = (new Pix)->setChavePix($cobranca->location)
+                ->setNomeTitular('Intelnet Telecom')
+                ->setCidadeTitular('Nova Cruz')
+                ->setTxid($cobranca->txid)
+                ->setValor(doubleval($cobranca->valor->original));
 
+            $stringPayload = $payload->gerarPayload();
 
+            $qrCode = new QrCode($stringPayload);
 
+            $stringPayload = $payload->gerarPayload();
+            //dd($stringPayload);
+            $qrCode = new QrCode($stringPayload);
 
-        $qrCode = new QrCode($stringPayload);
+            $image =  (new OutPut\Png)->output($qrCode, 120);
 
-        $image =  (new OutPut\Png)->output($qrCode, 120);
-
-        return $image;
+            return $image;
+        } else {
+            return 1;
+        }
     }
 
     private function gerarToken()
@@ -62,50 +75,131 @@ class PixController extends Controller
         return $server_output['access_token'];
     }
 
-    public function criarCobranca()
+    public function criarCobranca($vencimento, $nomeDevedor, $valor, $infoAdicionais, $txid, $cpf = null, $cnpj = null)
     {
         $authorization = "Authorization: Bearer " . $this->gerarToken();
         //dd($authorization);
-        $post = [
-            "calendario" => [
-                'dataDeVencimento' =>  "2020-12-31",
-                "validadeAposVencimento" => 30
-            ],
-            "devedor" => [
-                "cnpj" => "12345678000195",
-                "nome" => "Empresa de Serviços SA"
-            ],
-            "valor" => [
-                "original" => "37.00",
-                "multa" => [
-                    "modalidade"=> "2",
-                    "valorPerc"=> "15.00"
+
+        if(isset($cpf)){
+
+            $post = [
+                "calendario" => [
+                    'dataDeVencimento' =>  $vencimento,
+                    "validadeAposVencimento" => 30
                 ],
-                "juros"=> [
-                    "modalidade"=> "2",
-                    "valorPerc"=> "2.00"
-                ]
-            ],
-            "chave" => "7d9f0335-8dcc-4054-9bf9-0dbd61d36906",
-            "solicitacaoPagador" => "Serviço realizado.",
-            "infoAdicionais" => [
-                [
-                    "nome" => "Campo 1",
-                    "valor" => "Informação Adicional1 do PSP-Recebedor"
+                "devedor" => [
+                    "cpf" => $cpf,
+                    "nome" => $nomeDevedor
                 ],
-                [
-                    "nome" => "Campo 2",
-                    "valor" => "Informação Adicional2 do PSP-Recebedor"
+                "valor" => [
+                    "original" => $valor,
+                    "multa" => [
+                        "modalidade" => "2",
+                        "valorPerc" => "2.00"
+                    ],
+                    "juros" => [
+                        "modalidade" => "2",
+                        "valorPerc" => "0.33"
+                    ]
+                ],
+                "chave" => "7d9f0335-8dcc-4054-9bf9-0dbd61d36906",
+                "infoAdicionais" => [
+                    [
+                        "nome" => "contrato",
+                        "valor" => $infoAdicionais
+                    ],
+
                 ]
-            ]
-        ];
-        $url = "https://pix.santander.com.br/api/v1/sandbox/cob";
+            ];
+        }else{
+            $post = [
+                "calendario" => [
+                    'dataDeVencimento' =>  $vencimento,
+                    "validadeAposVencimento" => 30
+                ],
+                "devedor" => [
+                    "cnpj" => $cnpj,
+                    "nome" => $nomeDevedor
+                ],
+                "valor" => [
+                    "original" => $valor,
+                    "multa" => [
+                        "modalidade" => "2",
+                        "valorPerc" => "2.00"
+                    ],
+                    "juros" => [
+                        "modalidade" => "2",
+                        "valorPerc" => "0.33"
+                    ]
+                ],
+                "chave" => "7d9f0335-8dcc-4054-9bf9-0dbd61d36906",
+                "infoAdicionais" => [
+                    [
+                        "nome" => "contrato",
+                        "valor" => $infoAdicionais
+                    ],
+
+                ]
+            ];
+        }
+        $url = "https://pix.santander.com.br/api/v1/sandbox/cob/$txid";
         $ch = curl_init($url);
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post));
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($result);
+    }
+
+    public function buscarCobranca($txid)
+    {
+
+
+        //$txid = 'cd1fe328-c875-4812-85a6-f233ae41b662';
+        $authorization = "Authorization: Bearer " . $this->gerarToken();
+        $url = "https://pix.santander.com.br/api/v1/sandbox/cob/$txid";
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($result);
+    }
+
+    public function configurarWebHook($chave){
+
+        $authorization = "Authorization: Bearer " . $this->gerarToken();
+        $url = "https://pix.santander.com.br/api/v1/sandbox/webhook/$chave";
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($result);
+    }
+
+    public function consultarWebHook($chave){
+
+        $authorization = "Authorization: Bearer " . $this->gerarToken();
+        $url = "https://pix.santander.com.br/api/v1/sandbox/webhook/$chave";
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', $authorization));
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         $result = curl_exec($ch);
         curl_close($ch);
