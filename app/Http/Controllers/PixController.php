@@ -11,10 +11,7 @@ class PixController extends Controller
 {
     //
 
-    public function index(Request $request)
-    {
-
-
+    public function gerarQRCode(){
         $cobranca = $this->criarCobranca();
         //dd($cobranca);
         $payload = (new Pix)->setChavePix($cobranca->location)
@@ -35,6 +32,12 @@ class PixController extends Controller
         $image =  (new OutPut\Png)->output($qrCode, 120);
 
         return $image;
+    }
+    public function index(Request $request)
+    {
+
+        return view('dashboardPix');
+
     }
 
     private function gerarToken()

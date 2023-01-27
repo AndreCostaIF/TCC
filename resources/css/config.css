@@ -94,3 +94,21 @@ width: 30%;
 height: 50px;
 }
 
+.boxTools{
+    transition:  ease-out 0.2s;
+}
+.boxTools:hover{
+    transform: scale(1.1);
+
+}
+
+.boxPix{
+    border: 1px solid rgb(50,188,173);
+    color: red;
+}
+
+.boxPix:hover, .boxPix > i {
+    background-color: red;
+    color: #fff;
+}
+

@@ -401,7 +401,7 @@
                                                     class="dropdown-item" id=""><i class="bi bi-upc-scan"></i> BOLETO
                                                 </a>
                                             </li>
-                                            <li><a href="#" class="dropdown-item" type="button">
+                                            <li><a target="_blank" href="{{ route('imprimirBoletoPIX', [$boleto->id]) }}" class="dropdown-item" type="button">
                                                 <img src="{{ asset('assets/icone-pix.svg') }}" class="text-info" width="18" height="18" alt="">
                                                  BOLETO COM PIX
                                                 </a>
