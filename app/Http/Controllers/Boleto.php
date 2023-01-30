@@ -487,6 +487,98 @@ class Boleto extends Controller
         }
     }
 
+    public function buscarBoletoPix($id = null)
+    {
+        if ($this->erroAutenticado()) {
+            return redirect()->route('index');
+        }
+
+        $boleto = json_decode(Financeiros::where([
+            ['id', $id]
+        ])->get(), true);
+
+
+        $cliente = json_decode(Clientes::where(
+            'id',
+            $boleto[0]['cliente_id_web']
+        )->get(), true);
+
+        $boleto = $boleto[0];
+        if ($cliente == []) {
+            return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
+        }
+
+        $cliente = $cliente[0];
+
+        if (isset($cliente['pessoa_fisica_id'])) {
+
+            $pessoaFisica =  json_decode(Pessoa_fisica::where([
+                ['id', $cliente['pessoa_fisica_id']]
+            ])->get(), true);
+
+
+            $idTelefone = $pessoaFisica[0]['lista_telefonica_id'];
+            $pessoaFisica = $pessoaFisica[0];
+
+
+            $enderecoJoin = json_decode(DB::table('lista_telefonica')
+                ->join('catalogo_enderecos', 'lista_telefonica.catalogo_enderecos_id', '=', 'catalogo_enderecos.id')
+                ->join('cidades', 'catalogo_enderecos.cidades_id', '=', 'cidades.id')
+                ->join('estados', 'cidades.estados_cod_estados', '=', 'estados.id')
+                ->select('lista_telefonica.*', 'catalogo_enderecos.*', 'cidades.*', 'estados.*')
+                ->where('lista_telefonica.id', '=', $idTelefone)
+                ->get(), true);
+
+            $endereco = $enderecoJoin[0];
+
+
+            $pixController = new PixController();
+            $msg = str_replace("\n", "<br>", $boleto['descricao']);
+
+
+
+            $cobrancaPix = $pixController->gerarQrCode($boleto['reg_vencimento'], $pessoaFisica['nome'], $boleto['reg_valor_total'], $msg, $boleto['id'], $pessoaFisica['cpf'],null);
+            $image = base64_encode($cobrancaPix['image']);
+
+            echo "<img width=100 height=100 src='data:image/png;base64, $image'";
+            echo "<br><br>";
+            echo "<h1>PIX COPIA COLA</h1>";
+            echo $cobrancaPix['payload'];
+
+
+            //return $cobrancaPix;
+
+        } else {
+            $pessoaJuridica =  json_decode(PessoaJuridica::where([
+                ['id', $cliente['pessoa_juridica_id']]
+            ])->get(), true);
+
+
+            $idTelefone = $pessoaJuridica[0]['lista_telefonica_id'];
+            $pessoaJuridica = $pessoaJuridica[0];
+
+
+            $enderecoJoin = json_decode(DB::table('lista_telefonica')
+                ->join('catalogo_enderecos', 'lista_telefonica.catalogo_enderecos_id', '=', 'catalogo_enderecos.id')
+                ->join('cidades', 'catalogo_enderecos.cidades_id', '=', 'cidades.id')
+                ->join('estados', 'cidades.estados_cod_estados', '=', 'estados.id')
+                ->select('lista_telefonica.*', 'catalogo_enderecos.*', 'cidades.*', 'estados.*')
+                ->where('lista_telefonica.id', '=', $idTelefone)
+                ->get(), true);
+
+            $endereco = $enderecoJoin[0];
+
+
+            $pixController = new PixController();
+            $msg = str_replace("\n", "<br>", $boleto['descricao']);
+
+
+            $cobrancaPix = $pixController->gerarQrCode($boleto['reg_vencimento'], $pessoaJuridica['fantasia'], $boleto['reg_valor_total'], $msg, $boleto['id'],null,  $pessoaJuridica['cnpj']);
+
+            return $cobrancaPix;
+        }
+    }
+
     public function emitirBoletoUnitarioComPix($id = null)
     {
         if ($this->erroAutenticado()) {
@@ -565,7 +657,8 @@ class Boleto extends Controller
             $pix = new PixController();
             if($pix->gerarQrCode($boleto['reg_vencimento'], $pessoaFisica['nome'], $boleto['reg_valor_total'], $msg, $boleto['id'], $pessoaFisica['cpf'],null) != 1){
 
-                $image = base64_encode($pix->gerarQrCode($boleto['reg_vencimento'], $pessoaFisica['nome'], $boleto['reg_valor_total'], $msg, $boleto['id'], $pessoaFisica['cpf'],null));
+                $pixGerado = $pix->gerarQrCode($boleto['reg_vencimento'], $pessoaFisica['nome'], $boleto['reg_valor_total'], $msg, $boleto['id'], $pessoaFisica['cpf'],null);
+                $image = base64_encode($pixGerado['image']);
 
                 $arr = [
                     'pix'=>"<img width=100 height=100 src='data:image/png;base64, $image'>",
@@ -633,8 +726,8 @@ class Boleto extends Controller
             $pix = new PixController();
             if($pix->gerarQrCode($boleto['reg_vencimento'], $pessoaJuridica['fantasia'], $boleto['reg_valor_total'], $msg, $boleto['id'], null,$pessoaJuridica['cnpj']) != 1){
 
-                $image = base64_encode($pix->gerarQrCode($boleto['reg_vencimento'], $pessoaJuridica['fantasia'], $boleto['reg_valor_total'], $msg, $boleto['id'], null,$pessoaJuridica['cnpj']));
-
+                $pixGerado = $pix->gerarQrCode($boleto['reg_vencimento'], $pessoaJuridica['fantasia'], $boleto['reg_valor_total'], $msg, $boleto['id'] ,null, $pessoaJuridica['cpf']);
+                $image = base64_encode($pixGerado['image']);
                 $arr = [
                     'pix'=>"<img width=100 height=100 src='data:image/png;base64, $image'>",
                     0 => 'Pagar antes da data do vencimento',

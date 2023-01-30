@@ -17,13 +17,7 @@ class PixController extends Controller
         if ($this->buscarCobranca($txid) != []) {
             $cobranca = $this->buscarCobranca($txid);
         } else {
-
-            if(isset($cpf)){
-
-                $cobranca = $this->criarCobranca($vencimento, $nomeDevedor, $valor, $infoAdicionais, $txid, $cpf, $cnpj);
-            }else{
-                $cobranca = $this->criarCobranca($vencimento, $nomeDevedor, $valor, $infoAdicionais, $txid, $cpf, $cnpj);
-            }
+            $cobranca = $this->criarCobranca($vencimento, $nomeDevedor, $valor, $infoAdicionais, $txid, $cpf, $cnpj);
         }
 
         $cobranca->status = 'ATIVA';
@@ -38,13 +32,14 @@ class PixController extends Controller
 
             $qrCode = new QrCode($stringPayload);
 
-            $stringPayload = $payload->gerarPayload();
-            //dd($stringPayload);
-            $qrCode = new QrCode($stringPayload);
 
             $image =  (new OutPut\Png)->output($qrCode, 120);
 
-            return $image;
+            $arr['image'] = $image;
+            $arr['payload'] = $stringPayload;
+            $arr['empresa'] = $payload->getNomeTitular();
+            $arr['cidade'] = $payload->getCidadeTitular();
+            return $arr;
         } else {
             return 1;
         }
@@ -80,7 +75,7 @@ class PixController extends Controller
         $authorization = "Authorization: Bearer " . $this->gerarToken();
         //dd($authorization);
 
-        if(isset($cpf)){
+        if($cpf != null){
 
             $post = [
                 "calendario" => [

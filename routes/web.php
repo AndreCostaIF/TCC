@@ -43,4 +43,4 @@ Route::get('/boletos/massa/buscar',  [Boleto::class, 'boletosEmMassa'])->name('m
 Route::get('/boletos/massa',  [Boleto::class, 'boletosMassaView'])->name('massaView');
 Route::post('/boletos/imprimirMassa',  [Boleto::class, 'imprimirMassa'])->name('imprimirMassa');
 
-Route::get('/teste',  [Boleto::class, 'buscarCobranca'])->name('pix_teste');
+Route::get('/teste/{id}',  [Boleto::class, 'buscarBoletoPix'])->name('pix_teste');
