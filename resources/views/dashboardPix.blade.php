@@ -189,10 +189,10 @@
                 <form>
                     @csrf
                     <div class="mb-3">
-                        <label for="exampleInputEmail1" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="exampleInputEmail1"
+                        <label for="exampleInputEmail1" class="form-label">ID do boleto</label>
+                        <input type="text" class="form-control" id="exampleInputEmail1"
                             aria-describedby="emailHelp">
-                        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                        <div id="emailHelp" class="form-text">Insira o id do boleto para pegar os dados do.</div>
                     </div>
                     <div class="mb-3">
                         <label for="exampleInputPassword1" class="form-label">Password</label>
@@ -206,11 +206,30 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-outline-danger">Gerar cobrança</button>
+                <button type="button" class="btn btn-outline-danger" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">
+                    Gerar cobrança
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">Modal 2</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-bs-target="#modalCobranca" data-bs-toggle="modal">Back to first</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <!-- Modal Busca-->
 <div class="modal fade " id="modalbusca" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
