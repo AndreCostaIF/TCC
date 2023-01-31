@@ -176,8 +176,8 @@
 
 
 <!-- Modal GERAR COBRANCA-->
-<div class="modal fade " id="modalCobranca" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered ">
+<div class="modal fade " id="modalCobranca"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered " >
         <div class="modal-content shadow  border border-2 border-danger">
             <div class="modal-header">
                 <h1 class="modal-title fs-5 border-bottom border-danger" id="exampleModalLabel">
@@ -186,46 +186,179 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form id="formCobranca" method="POST"  enctype="multipart/form-data">
                     @csrf
+
                     <div class="mb-3">
                         <label for="exampleInputEmail1" class="form-label">ID do boleto</label>
-                        <input type="text" class="form-control" id="exampleInputEmail1"
+                        <input type="text" class="form-control" id="idboleto" name="idboleto"
                             aria-describedby="emailHelp">
-                        <div id="emailHelp" class="form-text">Insira o id do boleto para pegar os dados do.</div>
+                        <div id="emailHelp" class="form-text">Insira o id do boleto para buscar os dados do cliente de forma automatica.</div>
                     </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1">
+                    <div class="mb-3 text-center loadCobranca" style="display: none">
+                        <div class="spinner-border text-danger" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                          </div>
                     </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                    <!---->
+                    <div class="erro" style="display: none">
+                        <div class="mb-2 text-center fs-5 border-bottom border-danger">
+                            <span class="h6"><i class="bi bi-exclamation-diamond text-danger"></i> Nenhum boleto encontrado!<br> Verifique o <span class="text-danger">id do boleto</span> e tente novamente.</span>
+                        </div>
+                    </div>
+                    <div class="formDataPix" style="display: none">
+                        <div class="mb-2 text-center fs-5 border-bottom border-danger">
+                            <span class="h5"><i class="bi bi-person text-danger"></i> Dados do cliente</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Cliente</label>
+                            <input type="text" class="form-control" id="nomeDevedor" name="nomeDevedor" value="" disabled>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label hibrido">CPF</label>
+                            <input type="text" class="form-control" id="cpf" name="cpf" value="Cliente cpf" disabled>
+                        </div>
+
+                        <div class="mb-2 text-center fs-5 border-bottom border-danger">
+                            <span class="h5"><i class="bi bi-x-diamond-fill text-danger"></i> Dados para cobrança</span>
+                        </div>
+
+                        <div class="mb-3 d-flex justify-content-between">
+                            <div class="col-5">
+
+                                <label for="exampleInputPassword1" class="form-label">Vencimento</label>
+                                <input type="text" class="form-control" id="vencimento" name="vencimento" value="Cliente vencimento" disabled>
+                            </div>
+                            <div class="col-5">
+                                <label for="exampleInputPassword1" class="form-label">Valor</label>
+                                <input type="text" class="form-control" id="valor" name="valor" value="Cliente valor" disabled>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 d-flex justify-content-between">
+                            <div class="col-5">
+
+                                <label for="exampleInputPassword1" class="form-label">Lançamento</label>
+                                <input type="text" class="form-control" id="lancamento" name="lancamento" value="Cliente lancamento" disabled>
+                            </div>
+                            <div class="col-5">
+                                <label for="exampleInputPassword1" class="form-label">Mês Referente</label>
+                                <select class="form-select" aria-label="Default select example" id="mes_ref" name="mes_ref" disabled>
+                                    <option value="01">Janeiro</option>
+                                    <option value="02">Fevereiro</option>
+                                    <option value="03">Março</option>
+                                    <option value="04">Abril</option>
+                                    <option value="05">Maio</option>
+                                    <option value="06">Junho</option>
+                                    <option value="07">Julho</option>
+                                    <option value="08">Agosto</option>
+                                    <option value="09">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                  </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Informações adicionais</label>
+                            <textarea type="text" class="form-control" id="infoAdicionais" name="infoAdicionais" disabled>
+                                Cliente infoAdicionais
+                            </textarea>
+                        </div>
+
                     </div>
                 </form>
+
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Fechar</button>
-                <button type="button" class="btn btn-outline-danger" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal">
+                <button type="button" class="btn btn-outline-danger" style="display: none" id="gerarCobranca" data-bs-target="#modalCobranca2" data-bs-toggle="modal">
                     Gerar cobrança
                 </button>
+
             </div>
         </div>
     </div>
 </div>
-
-<div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+<!-- Modal GERAR COBRANCA 2-->
+<div class="modal fade" id="modalCobranca2" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
+      <div class="modal-content shadow  border border-2 border-danger">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">Modal 2</h1>
+          <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">
+            <i class="bi bi-x-diamond-fill text-danger"></i> Pague com <span class="text-danger"> Pix</span>
+        </h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+            <div class="pixbody text-center">
+                <div class="fs-4 ">
+                    <div class="nome">
+                        <div class="spinner-border text-danger" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                          </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <a  class="boxQrCode">
+                         <img src="" class="qrcode" alt="Carregando..." >
+                    </a>
+                    <div>
+                        <small class="opacity-50">Clique no QRCode para baixar</small>
+                    </div>
+                </div>
+                <div class="h2 fs-4 beneficiario">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                      </div>
+                </div>
+            </div>
+            <div class="pixfooter text-center p-2">
+                <div class="d-flex flex-column mb-3">
+                    <span class="h4 fs-4"><i class="bi bi-key text-danger"></i> Chave:</span>
+                    <span class="fs-5 chave">
+                        <div class="spinner-border text-danger" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                          </div>
+                    </span>
+                </div>
 
+                <div class="d-flex flex-column mb-3">
+                    <span class="h4 fs-4"><i class="bi bi-currency-dollar text-success"></i> Valor:</span>
+                    <span class="fs-5 valor">
+                        <div class="spinner-border text-danger" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                          </div>
+                    </span>
+                </div>
+            </div>
+            <div class="text-center pixbuttons"  style="display: none">
+                <input type="hidden" name="pixCopiaCola" id="pixCopiaCola" value="">
+                <button type="button" class="btn BTNpixCopiaCola btn-danger" id="toastbtn">
+                    <i class="bi bi-clipboard2"></i> Pix copia e Cola
+                </button>
+                <a  type="button" target="_blank" class="btn btn-outline-danger imprimirBoletoPix" id="copiaECola">
+                    <i class="bi bi-printer"></i> Imprimir boleto com pix
+                </a>
+
+                <div id="notificacao" class="toast position-fixed border border-danger shadow top-50 start-50 translate-middle p-3" >
+                    <div class="toast-header shadow bg-danger">
+                      <strong class="me-auto text-light fw-bold"><i class="bi bi-bell"></i> Notificação</strong>
+                      <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body ">
+                      <span class="text-success h6"><i class="bi bi-clipboard2-check"></i> Texto copiado com sucesso!</span>
+                    </div>
+                  </div>
+            </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" data-bs-target="#modalCobranca" data-bs-toggle="modal">Back to first</button>
+            <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Fechar</button>
+          <button class="btn btn-primary" data-bs-target="#modalCobranca" data-bs-toggle="modal">Nova cobrança</button>
         </div>
       </div>
     </div>

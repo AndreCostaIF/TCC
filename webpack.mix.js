@@ -15,7 +15,7 @@ mix.scripts(['node_modules/jquery/dist/jquery.js'],
  'public/jquery.js')
  .scripts('node_modules/bootstrap/dist/js/bootstrap.bundle.js',
             'public/bootstrap/bootstrap.js')
-.scripts('resources/js/form.js', 'public/form.js')
+.scripts(['resources/js/form.js', 'resources/js/pix.js'], 'public/form.js')
 .scripts('resources/js/modal.js' , 'public/modal.js')
 .scripts('resources/js/copy.js', 'public/copy.js')
 .scripts('resources/js/contract.js', 'public/contrato.js')

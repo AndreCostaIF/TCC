@@ -36,11 +36,19 @@ class Pix
         return $this;
     }
 
+    public function getNomeTitular(){
+        return $this->nome_titular;
+    }
+
     public function setCidadeTitular($cidade_titular)
     {
 
         $this->cidade_titular = $cidade_titular;
         return $this;
+    }
+
+    public function getCidadeTitular(){
+        return $this->cidade_titular;
     }
 
     public function setTxid($txid)
@@ -49,6 +57,7 @@ class Pix
         $this->txid = $txid;
         return $this;
     }
+
 
     public function setValor($valor)
     {

@@ -17,6 +17,8 @@ $('.copiarLD').on('click', function () {
     '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>'+
     '</div></div>')
     navigator.clipboard.writeText(this.parentElement.children[0].value)
+});
 
-
+$('.BTNpixCopiaCola').on('click', function () {
+    navigator.clipboard.writeText($('#pixCopiaCola').val())
 });

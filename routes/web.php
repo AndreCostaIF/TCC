@@ -48,4 +48,6 @@ Route::post('/boletos/imprimirMassa',  [Boleto::class, 'imprimirMassa'])->name('
 #AREA PIX
 Route::get('/pix',  [PixController::class, 'index'])->name('pix');
 Route::get('/teste',  [Boleto::class, 'buscarCobranca'])->name('pix_teste');
-Route::get('/boletos/imprimirpix/{id}',  [Boleto::class, 'emitirBoletoUnitarioComPix'])->name('imprimirBoletoPIX');
+Route::get('/boletos/imprimirpix/{id}',  [PixController::class, 'emitirBoletoUnitarioComPix'])->name('imprimirBoletoPIX');
+Route::get('/pix/dados',  [PixController::class, 'buscarDadosBoleto'])->name('buscarDadosBoleto');
+Route::post('/pix/cobranca',  [PixController::class, 'criarCobranca'])->name('criarCobranca');
