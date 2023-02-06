@@ -36,7 +36,6 @@ class Boleto extends Controller
         }
     }
 
-
     public function index($data = null)
     {
         if ($this->erroAutenticado()) {
@@ -339,18 +338,19 @@ class Boleto extends Controller
         }
     }
 
-
     public function emitirBoletoUnitario($id)
     {
         if ($this->erroAutenticado()) {
             return redirect()->route('index');
         }
-
-        //dd();
+        $pixController = new PixController();
         $boleto = json_decode(Financeiros::where([
             ['id', $id]
         ])->get(), true);
 
+        if ($boleto[0] == []) {
+            return redirect()->back()->with('erroCliente', 'Boleto não encontrado');
+        }
         $cliente = json_decode(Clientes::where(
             'id',
             $boleto[0]['cliente_id_web']
@@ -386,17 +386,11 @@ class Boleto extends Controller
             $sacado = new Agente($pessoaFisica['nome'], $pessoaFisica['cpf'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
             $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
 
-            $valorExtra = Financeiros::valoresExtra($boleto['id']);
-            $descontoBoleto =  $valorExtra['desconto'];
-            $acrescimoBoleto =  $valorExtra['acrescimo'];
-
-            $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
-
-
+            $boleto['reg_valor_total'] = valoresExtra($boleto['id'], $boleto['reg_valor']);
 
             $boletoSantander = new Santander(array(
                 // Parâmetros obrigatórios
-
+                'logoPath' => asset('assets/logo.svg'),
                 'dataVencimento' => new DateTime($boleto['reg_vencimento']),
                 'valor' => $boleto['reg_valor_total'],
                 'sequencial' => $boleto['id'], // Para gerar o nosso número
@@ -412,19 +406,31 @@ class Boleto extends Controller
 
             $msg = str_replace("\n", "<br>", $boleto['descricao']);
 
+            $pix = $pixController->gerarQrCode($boleto['id'], $boleto['reg_valor_total'], 120);
+            if($pix != 1){
 
+                $image = $pix['image'];
 
-            //dd(base64_encode($image));
+                $arr = [
+                    'pix'=>"<img  src='data:image/png;base64, $image'>",
+                    0 => 'Pagar antes da data do vencimento',
+                    1 => $msg,
+                ];
 
+                $boletoSantander->setInstrucoes($arr);
 
-            $arr = [
-                0 => 'Pagar antes da data do vencimento',
-                1 => $msg,
-            ];
+                echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br>';
+            }else{
 
-            $boletoSantander->setInstrucoes($arr);
+                $arr = [
+                    0 => 'Pagar antes da data do vencimento',
+                    1 => $msg,
+                ];
 
-            echo $boletoSantander->getOutput();
+                $boletoSantander->setInstrucoes($arr);
+
+                echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br>';
+            }
 
 
         } else {
@@ -451,16 +457,11 @@ class Boleto extends Controller
             $sacado = new Agente($pessoaJuridica['fantasia'], $pessoaJuridica['cnpj'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
             $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
 
-            $valorExtra = Financeiros::valoresExtra($boleto['id']);
-            $descontoBoleto =  $valorExtra['desconto'];
-            $acrescimoBoleto =  $valorExtra['acrescimo'];
-
-
-            $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
+            $boleto['reg_valor_total'] = valoresExtra($boleto['id'], $boleto['reg_valor']);
 
             $boletoSantander = new Santander(array(
                 // Parâmetros obrigatórios
-
+                'logoPath' => asset('assets/logo.svg'),
                 'dataVencimento' => new DateTime($boleto['reg_vencimento']),
                 'valor' => $boleto['reg_valor_total'],
                 'sequencial' => $boleto['id'], // Para gerar o nosso número
@@ -475,14 +476,30 @@ class Boleto extends Controller
 
             $msg = str_replace("\n", "<br>", $boleto['descricao']);
 
-            $arr = [
-                0 => 'Pagar antes da data do vencimento',
-                1 => $msg
+            $pix = $pixController->gerarQrCode($boleto['id'],   $boleto['reg_valor_total'], 120);
+            if($pix != 1){
 
-            ];
-            $boletoSantander->setInstrucoes($arr);
+                $image = $pix['image'];
+                $arr = [
+                    'pix'=>"<img src='data:image/png;base64, $image'>",
+                    0 => 'Pagar antes da data do vencimento',
+                    1 => $msg,
+                ];
 
-            echo $boletoSantander->getOutput();
+                $boletoSantander->setInstrucoes($arr);
+
+                echo $boletoSantander->getOutput()  . '<br><br><br><br><br><br><br><br><br><br><br><br><br>';
+            }else{
+
+                $arr = [
+                    0 => 'Pagar antes da data do vencimento',
+                    1 => $msg,
+                ];
+
+                $boletoSantander->setInstrucoes($arr);
+
+                echo $boletoSantander->getOutput()  . '<br><br><br><br><br><br><br><br><br><br><br><br><br>';
+            }
         }
     }
 
@@ -511,19 +528,9 @@ class Boleto extends Controller
             ->where('financeiros.reg_lancamento', 'like', $search . '%')
             ->get();
 
-
-
-        $boletos = DB::table('financeiros')
-            ->join('clientes', 'financeiros.cliente_id_web', '=', 'clientes.id')
-            ->select('clientes.tipo', 'clientes.pessoa_fisica_id', 'clientes.pessoa_juridica_id',  'financeiros.*')
-            ->where('financeiros.reg_lancamento', 'like', $search . '%')
-            ->get();
-
-        $arr = [];
         foreach ($boletos as $item) {
 
             if ($item->tipo == 'F') {
-
                 $cidade = json_decode(DB::table('pessoa_fisica')
                     ->join('lista_telefonica', 'pessoa_fisica.lista_telefonica_id', '=', 'lista_telefonica.id')
                     ->join('catalogo_enderecos', 'lista_telefonica.catalogo_enderecos_id', '=', 'catalogo_enderecos.id')
@@ -533,11 +540,9 @@ class Boleto extends Controller
                     ->get(), true);
 
                 $item->cidade = $cidade[0]['cidade'];
-
                 $valorExtra = Financeiros::valoresExtra($item->id);
                 $descontoBoleto =  $valorExtra['desconto'];
                 $acrescimoBoleto =  $valorExtra['acrescimo'];
-
                 $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
             } else {
 
@@ -550,16 +555,14 @@ class Boleto extends Controller
                     ->get(), true);
 
                 $item->cidade = $cidade[0]['cidade'];
-
                 $valorExtra = Financeiros::valoresExtra($item->id);
                 $descontoBoleto =  $valorExtra['desconto'];
                 $acrescimoBoleto =  $valorExtra['acrescimo'];
-
                 $item->reg_valor_total = ($item->reg_valor + $acrescimoBoleto) - $descontoBoleto;
             }
         }
 
-        $boleto = paginate($boletos->sortBy('cidade'), 20);
+        $boleto = paginate($boletos->sortBy('cidade'), 200);
 
 
 
@@ -579,134 +582,13 @@ class Boleto extends Controller
             return redirect()->route('index');
         }
 
-
         $boletoID = explode(',', $request->get('imprimirTodos'));
 
         foreach ($boletoID as $id) {
 
-
-            $boleto = json_decode(Financeiros::where([
-                ['id', $id]
-            ])->get(), true);
-
-            $cliente = json_decode(Clientes::where(
-                'id',
-                $boleto[0]['cliente_id_web']
-            )->get(), true);
-            $boleto = $boleto[0];
-            $cliente = $cliente[0];
-            if (isset($cliente['pessoa_fisica_id'])) {
-
-                $pessoaFisica =  json_decode(Pessoa_fisica::where([
-                    ['id', $cliente['pessoa_fisica_id']]
-                ])->get(), true);
-
-
-                $idTelefone = $pessoaFisica[0]['lista_telefonica_id'];
-                $pessoaFisica = $pessoaFisica[0];
-
-
-                $enderecoJoin = json_decode(DB::table('lista_telefonica')
-                    ->join('catalogo_enderecos', 'lista_telefonica.catalogo_enderecos_id', '=', 'catalogo_enderecos.id')
-                    ->join('cidades', 'catalogo_enderecos.cidades_id', '=', 'cidades.id')
-                    ->join('estados', 'cidades.estados_cod_estados', '=', 'estados.id')
-                    ->select('lista_telefonica.*', 'catalogo_enderecos.*', 'cidades.*', 'estados.*')
-                    ->where('lista_telefonica.id', '=', $idTelefone)
-                    ->get(), true);
-
-                $endereco = $enderecoJoin[0];
-
-
-                $sacado = new Agente($pessoaFisica['nome'], $pessoaFisica['cpf'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
-                $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
-
-                $valorExtra = Financeiros::valoresExtra($boleto['id']);
-                $descontoBoleto =  $valorExtra['desconto'];
-                $acrescimoBoleto =  $valorExtra['acrescimo'];
-
-                $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
-
-
-                $boletoSantander = new Santander(array(
-                    // Parâmetros obrigatórios
-
-                    'dataVencimento' => new DateTime($boleto['reg_vencimento']),
-                    'valor' => $boleto['reg_valor_total'],
-                    'sequencial' => $boleto['id'], // Para gerar o nosso número
-                    'sacado' => $sacado,
-                    'cedente' => $cedente,
-                    'agencia' => 4543, // Até 4 dígitos
-                    'carteira' => 101,
-                    'conta' => 1300398, // Até 8 dígitos
-                    'convenio' => 9818596, // 4, 6 ou 7 dígitos
-                ));
-
-                $msg = str_replace("\n", "<br>", $boleto['descricao']);
-
-                $arr = [
-                    0 => 'Pagar antes da data do vencimento',
-                    1 => $msg
-
-                ];
-                $boletoSantander->setInstrucoes($arr);
-
-                echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
-            } else {
-                $pessoaJuridica =  json_decode(PessoaJuridica::where([
-                    ['id', $cliente['pessoa_juridica_id']]
-                ])->get(), true);
-
-
-                $idTelefone = $pessoaJuridica[0]['lista_telefonica_id'];
-                $pessoaJuridica = $pessoaJuridica[0];
-
-
-                $enderecoJoin = json_decode(DB::table('lista_telefonica')
-                    ->join('catalogo_enderecos', 'lista_telefonica.catalogo_enderecos_id', '=', 'catalogo_enderecos.id')
-                    ->join('cidades', 'catalogo_enderecos.cidades_id', '=', 'cidades.id')
-                    ->join('estados', 'cidades.estados_cod_estados', '=', 'estados.id')
-                    ->select('lista_telefonica.*', 'catalogo_enderecos.*', 'cidades.*', 'estados.*')
-                    ->where('lista_telefonica.id', '=', $idTelefone)
-                    ->get(), true);
-
-                $endereco = $enderecoJoin[0];
-
-
-                $sacado = new Agente($pessoaJuridica['fantasia'], $pessoaJuridica['cnpj'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
-                $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
-
-                $valorExtra = Financeiros::valoresExtra($boleto['id']);
-                $descontoBoleto =  $valorExtra['desconto'];
-                $acrescimoBoleto =  $valorExtra['acrescimo'];
-
-                $boleto['reg_valor_total'] = ($boleto['reg_valor'] + $acrescimoBoleto) - $descontoBoleto;
-
-                $boletoSantander = new Santander(array(
-                    // Parâmetros obrigatórios
-
-                    'dataVencimento' => new DateTime($boleto['reg_vencimento']),
-                    'valor' => $boleto['reg_valor_total'],
-                    'sequencial' => $boleto['id'], // Para gerar o nosso número
-                    'sacado' => $sacado,
-                    'cedente' => $cedente,
-                    'agencia' => 4543, // Até 4 dígitos
-                    'carteira' => 101,
-                    'conta' => 1300398, // Até 8 dígitos
-                    'convenio' => 9818596, // 4, 6 ou 7 dígitos
-                ));
-
-                $msg = str_replace("\n", "<br>", $boleto['descricao']);
-
-                $arr = [
-                    0 => 'Pagar antes da data do vencimento',
-                    1 => $msg
-
-                ];
-                $boletoSantander->setInstrucoes($arr);
-
-                echo $boletoSantander->getOutput() . '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
-            }
+            $this->emitirBoletoUnitario($id);
         }
+
     }
 
     public function baixaBoleto(Request $request)

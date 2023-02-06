@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 include('openboleto/autoloader.php');
 
+use App\ConstantesPix;
 use App\Models\Cidades;
 use App\Models\historicoRemessa;
+use App\Models\PixModel;
 use Illuminate\Http\Request;
 use OpenBoleto\Banco\Santander;
 
@@ -217,8 +219,6 @@ class TradutorRemessa extends Controller
                 $numDiasProtesto = "00"; // 392 - 393 (002)
                 $numSequencialRegistroMovimento = substr($x, 394, 6); // 395 - 400 (006)
 
-
-
                 $registroMovimento = $codigoRegistro . $tipoBeneficiario . $cnpjOuCpf . $codTransmissao . $controleParticipante .
                     $nossoNumero . $dataSegundoDesc . $branco1espaco . $infoMulta . $percentualMulta .
                     $unidadeValorMoedaCorrente . $valorDotituloOutraUnidade . $branco4espaco . $dataCobrancaMulta . $codigoCarteira . $codigoOcorrencia .
@@ -227,9 +227,6 @@ class TradutorRemessa extends Controller
                     $IOF . $valorBatimento . $codigoIdentificacaoSacado . $identificacaoSacado . $nomeSacado . $enderecoSacado . $bairro .
                     $cepCompleto . $municipio . $ufSacado . $nomeSacador . $branco1espaco . $identificadorComplemento . $complemento .
                     $branco6espaco . $numDiasProtesto . $branco1espaco . $numSequencialRegistroMovimento;
-
-
-
 
                 $valorTotalTitulos += intval($valorTitulo);
 
@@ -241,9 +238,50 @@ class TradutorRemessa extends Controller
                 //escreve o registro de movimento no arquivo remerssa santander
                 fwrite($remessaSantader, $registroMovimento . "\n");
             }
+
+            $arquivoComRegistroSantander = file($nameArq);
+            $tam = sizeof($arquivoComRegistroSantander) + 1;
+
+            for($i = 1; $i <= (sizeof($arquivoComRegistroSantander) - 1); $i++){
+
+                $x = $arquivoComRegistroSantander[$i];
+
+                $codigoRegistro = '8';
+                $identificacaoTipoPagamento = '03';
+                $pagamentosPossiveis = '01';
+                $tipoDeValor = '2';
+                $valorMaximo = substr($x, 126, 13);
+                $percentualMaximo = '99999';
+                $valorMinimo = substr($x, 126, 13);
+                $percenualMinimo = '00001';
+                $tipoDeChave = ConstantesPix::TYPE_KEY;
+                $chaveDict = completarPosicoes(ConstantesPIX::PIX_KEY, 77, '0');
+                $txid = 'YK'.'T'. '076924250' . '00000' . substr($x, 63, 8) . date('dmy');
+                $txidCompleto = completarPosicoes($txid, 35, '0');
+                //dd(strlen($txid));
+                $brancos239 = str_pad("", 239, " ");
+                $numSequencial =  completarPosicoes($tam, 6, '0');
+
+                $registroQrCode = $codigoRegistro . $identificacaoTipoPagamento . $pagamentosPossiveis . $tipoDeValor .
+                $valorMaximo . $percentualMaximo . $valorMinimo . $percenualMinimo . $tipoDeChave . $chaveDict .
+                $txidCompleto . $brancos239 . $numSequencial;
+
+                //escreve o registro de movimento no arquivo remerssa santander
+                fwrite($remessaSantader, $registroQrCode . "\n");
+
+                $pixModel = new PixModel();
+                $pixModel->boleto_id = intval(substr($x, 37, 25));
+                $pixModel->txid = $txid;
+                $pixModel->save();
+
+                $tam++;
+            }
+
+
+            $arquivoComRegistroSantander = file($nameArq);
             $x = $remessaBradesco[sizeof($remessaBradesco) - 1];
             $codigoRegistro = substr($x, 0, 1);
-            $quantidadeLinhas = "" . sizeof($remessaBradesco);
+            $quantidadeLinhas = "" . sizeof($arquivoComRegistroSantander)+1;
             if (strlen($quantidadeLinhas) < 6) {
                 $completar = 6 - strlen($quantidadeLinhas);
                 $quantidadeLinhas = str_pad("", $completar, "0") . $quantidadeLinhas;
@@ -255,7 +293,7 @@ class TradutorRemessa extends Controller
             }
 
             $zeros = str_pad("", 374, "0");
-            $numSequencialTrailer = substr($x, 394, 6); // 395 - 400 (006)
+            $numSequencialTrailer = completarPosicoes($tam++, 6, '0'); // 395 - 400 (006)
 
 
             $trailer = $codigoRegistro . $quantidadeLinhas . $valorTotal . $zeros . $numSequencialTrailer;
@@ -272,6 +310,8 @@ class TradutorRemessa extends Controller
             $historicoRemessa->save();
 
             $remessa['historico'] = $historicoRemessa;
+
+
 
             return redirect()->route('remessa', $remessa);
         }else{

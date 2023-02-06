@@ -231,6 +231,42 @@
             </td>
         </tr>
         <tr>
+            <td colspan="7" class="notopborder">
+                <div class="titulo ">
+                    <div style="
+                        display: block;">
+                        <div style="
+                            display: flex;
+
+                            flex-direction: row-reverse;
+
+                        ">
+                            <?php isset($instrucoes['pix']) ? print_r("<span class='conteudo'>Pague utilizando o QR Code abaixo:</span>") : print "" ?>
+
+                        </div>
+                        <div style="
+                            display: flex;
+
+                            flex-direction: row-reverse;
+
+
+                        ">
+                            <?php echo $instrucoes['pix']; ?>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </td>
+            <td>
+                <div class="titulo"></div>
+                <div>
+
+                </div>
+            </td>
+        </tr>
+        <tr>
             <td colspan="7" valign="top">
                 <div class="titulo">Pagador</div>
                 <div class="conteudo float_left">
@@ -264,21 +300,11 @@
             </td>
 
         </tr>
-        <tr>
-            <td colspan="8" class="noborder">
-                <div style="
 
-                display:flex;
-                            justify-content: space-between;
-                            align-items: center;
-                        " class="titulo">
 
-                        <?php isset($instrucoes['pix']) ? print_r("<span class='conteudo'>Pague com seu Pix:</span>") : print "" ?>
-                        <?php echo $instrucoes['pix']; ?>
 
-                </div>
-            </td>
-        </tr>
+
+
 
     </tbody>
 </table>

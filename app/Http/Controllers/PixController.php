@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 include('openboleto/autoloader.php');
+
+use App\ConstantesPix;
 use App\Models\Clientes;
 use App\Models\Financeiros;
 use App\Models\Pessoa_fisica;
 use App\Models\PessoaJuridica;
-use DateTime;
+use App\Models\PixModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Mpdf\QrCode\QrCode;
 use Mpdf\QrCode\OutPut;
-use OpenBoleto\Agente;
-use OpenBoleto\Banco\Santander;
+
 use Pix;
 
 class PixController extends Controller
@@ -29,20 +29,24 @@ class PixController extends Controller
         }
     }
 
-    public function gerarQrCode($txid, $tam = 120)
+    public function gerarQrCode($idBoleto = null, $valor = 0, $tam = 120)
     {
 
-        if ($this->buscarCobranca($txid) != []) {
-            $cobranca = $this->buscarCobranca($txid);
+        if ($idBoleto != null) {
+            $txid  = PixModel::getTxid($idBoleto);
+            //VER SE TA COM JSON DECODE E JOGA O RESTO DO CODIGO AQUI :)
+
+        }else{
+            return '';
         }
 
-        $cobranca->status = 'ATIVA';
-        if ($cobranca->status != 'CONCLUIDA') {
-            $payload = (new Pix)->setChavePix($cobranca->location)
+
+        if ($txid != null) {
+            $payload = (new Pix)->setChavePix(ConstantesPix::PIX_KEY)
                 ->setNomeTitular('Intelnet Telecom')
                 ->setCidadeTitular('Nova Cruz')
-                ->setTxid($cobranca->txid)
-                ->setValor(doubleval($cobranca->valor->original));
+                ->setTxid($txid->txid)
+                ->setValor(doubleval($valor));
 
             $stringPayload = $payload->gerarPayload();
 
@@ -288,146 +292,9 @@ class PixController extends Controller
             return redirect()->route('index');
         }
 
-        $boleto = json_decode(Financeiros::where([
-            ['id', $id]
-        ])->get(), true);
+        $chata = new Boleto();
+        $chata->emitirBoletoUnitario($id);
 
 
-        $cliente = json_decode(Clientes::where(
-            'id',
-            $boleto[0]['cliente_id_web']
-        )->get(), true);
-        $boleto = $boleto[0];
-        if ($cliente == []) {
-            return redirect()->back()->with('erroCliente', 'Cliente não encontrado');
-        }
-        $cliente = $cliente[0];
-
-        if (isset($cliente['pessoa_fisica_id'])) {
-
-            $pessoaFisica =  json_decode(Pessoa_fisica::where([
-                ['id', $cliente['pessoa_fisica_id']]
-            ])->get(), true);
-
-
-            $idTelefone = $pessoaFisica[0]['lista_telefonica_id'];
-            $pessoaFisica = $pessoaFisica[0];
-
-
-            $enderecoJoin = json_decode(DB::table('lista_telefonica')
-                ->join('catalogo_enderecos', 'lista_telefonica.catalogo_enderecos_id', '=', 'catalogo_enderecos.id')
-                ->join('cidades', 'catalogo_enderecos.cidades_id', '=', 'cidades.id')
-                ->join('estados', 'cidades.estados_cod_estados', '=', 'estados.id')
-                ->select('lista_telefonica.*', 'catalogo_enderecos.*', 'cidades.*', 'estados.*')
-                ->where('lista_telefonica.id', '=', $idTelefone)
-                ->get(), true);
-
-            $endereco = $enderecoJoin[0];
-
-
-            $sacado = new Agente($pessoaFisica['nome'], $pessoaFisica['cpf'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
-            $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
-
-            $boleto['reg_valor_total'] = valoresExtra($boleto['id'], $boleto['reg_valor']);
-
-            $boletoSantander = new Santander(array(
-                // Parâmetros obrigatórios
-
-                'dataVencimento' => new DateTime($boleto['reg_vencimento']),
-                'valor' => $boleto['reg_valor_total'],
-                'sequencial' => $boleto['id'], // Para gerar o nosso número
-                'sacado' => $sacado,
-                'cedente' => $cedente,
-                'agencia' => 4543, // Até 4 dígitos
-                'carteira' => 101,
-                'conta' => 1300398, // Até 8 dígitos
-                'convenio' => 9818596, // 4, 6 ou 7 dígitos
-                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web'] . "", 10, "0"),
-
-            ));
-
-            $msg = str_replace("\n", "<br>", $boleto['descricao']);
-
-            $pix = $this->gerarQrCode($boleto['id'], 120);
-            if($pix != 1){
-
-                $image = $pix['image'];
-
-                $arr = [
-                    'pix'=>"<img  src='data:image/png;base64, $image'>",
-                    0 => 'Pagar antes da data do vencimento',
-                    1 => $msg,
-                ];
-
-                $boletoSantander->setInstrucoes($arr);
-
-                echo $boletoSantander->getOutput();
-            }else{
-
-                echo 'Pix pago';
-            }
-
-
-        } else {
-            $pessoaJuridica =  json_decode(PessoaJuridica::where([
-                ['id', $cliente['pessoa_juridica_id']]
-            ])->get(), true);
-
-
-            $idTelefone = $pessoaJuridica[0]['lista_telefonica_id'];
-            $pessoaJuridica = $pessoaJuridica[0];
-
-
-            $enderecoJoin = json_decode(DB::table('lista_telefonica')
-                ->join('catalogo_enderecos', 'lista_telefonica.catalogo_enderecos_id', '=', 'catalogo_enderecos.id')
-                ->join('cidades', 'catalogo_enderecos.cidades_id', '=', 'cidades.id')
-                ->join('estados', 'cidades.estados_cod_estados', '=', 'estados.id')
-                ->select('lista_telefonica.*', 'catalogo_enderecos.*', 'cidades.*', 'estados.*')
-                ->where('lista_telefonica.id', '=', $idTelefone)
-                ->get(), true);
-
-            $endereco = $enderecoJoin[0];
-
-
-            $sacado = new Agente($pessoaJuridica['fantasia'], $pessoaJuridica['cnpj'], $endereco['endereco'], $endereco['cep'], $endereco['cidade'], $endereco['sigla']);
-            $cedente = new Agente('INTELNET TELECOM MULTIMIDIA LTDA', '07.692.425/0001-58', 'Av. Assis Chateubrind', '59215-000', 'Nova Cruz', 'RN');
-
-            $boleto['reg_valor_total'] = valoresExtra($boleto['id'], $boleto['reg_valor']);
-
-            $boletoSantander = new Santander(array(
-                // Parâmetros obrigatórios
-
-                'dataVencimento' => new DateTime($boleto['reg_vencimento']),
-                'valor' => $boleto['reg_valor_total'],
-                'sequencial' => $boleto['id'], // Para gerar o nosso número
-                'sacado' => $sacado,
-                'cedente' => $cedente,
-                'agencia' => 4543, // Até 4 dígitos
-                'carteira' => 101,
-                'conta' => 1300398, // Até 8 dígitos
-                'convenio' => 9818596, // 4, 6 ou 7 dígitos
-                'numeroDocumento' => completarPosicoes($boleto['cliente_id_web'] . "", 10, "0")
-            ));
-
-            $msg = str_replace("\n", "<br>", $boleto['descricao']);
-
-            $pix = $this->gerarQrCode($boleto['id']);
-            if($pix != 1){
-
-                $image = $pix['image'];
-                $arr = [
-                    'pix'=>"<img src='data:image/png;base64, $image'>",
-                    0 => 'Pagar antes da data do vencimento',
-                    1 => $msg,
-                ];
-
-                $boletoSantander->setInstrucoes($arr);
-
-                echo $boletoSantander->getOutput();
-            }else{
-
-                echo 'Pix pago';
-            }
-        }
     }
 }

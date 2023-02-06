@@ -297,7 +297,7 @@
         <div class="modal-body">
             <div class="pixbody text-center">
                 <div class="fs-4 ">
-                    <div class="nome">
+                    <div class="nome ">
                         <div class="spinner-border text-danger" role="status">
                             <span class="visually-hidden">Carregando...</span>
                           </div>
@@ -311,7 +311,7 @@
                         <small class="opacity-50">Clique no QRCode para baixar</small>
                     </div>
                 </div>
-                <div class="h2 fs-4 beneficiario">
+                <div class="h2 fs-4 beneficiario  text-uppercase">
                     <div class="spinner-border text-danger" role="status">
                         <span class="visually-hidden">Carregando...</span>
                       </div>
