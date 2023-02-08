@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\historicoRetorno;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TradutorRetorno extends Controller
 {
@@ -60,8 +61,10 @@ class TradutorRetorno extends Controller
                 $retorno['retornoBradesco'] = $request->get('retornoBradesco');
                 $retorno['dataGerado'] = $request->get('dataGerado');
                 $retorno['horaGerado'] = $request->get('horaGerado');
+                $retorno['title'] = "Retorno";
                 return view('retorno', $retorno);
             } else {
+                $retorno['title'] = "Retorno";
                 $retorno['historico'] = historicoRetorno::pegarTodos();
                 return view('retorno', $retorno);
             }
@@ -83,8 +86,11 @@ class TradutorRetorno extends Controller
         if (substr($retornoSantander2[0], 2, 7) == 'RETORNO' && substr($retornoSantander2[0], 79, 9) == 'SANTANDER') {
 
             //SALVA O ARQUIVO ORIGINAL DO RETORNO E GUARDA O CAMINHO
-            $name = $request->file('arq')->store('public/retorno');
+
+            $name = $request->file('arq')->storeAs("public/retorno", $request->file('arq')->getClientOriginalName());
             //TROCA O PUBLIC POR STORAGE NA URL
+
+
             $name = str_replace('public', 'storage', $name);
 
 
@@ -111,6 +117,7 @@ class TradutorRetorno extends Controller
 
             //NOME DO ARQUIVO
             $nomeArq = 'CB' . substr($dataGravacao, 0, 5). letraAleatoria() . '.RET';
+            Storage::move('public/retorno/'.$request->file('arq')->getClientOriginalName(), "public/retorno/$nomeArq");
 
             $retornoBradesco = fopen($nomeArq, 'w');
             //ESCREVE NO ARQUIVO
@@ -297,10 +304,23 @@ class TradutorRetorno extends Controller
             $historicoRetorno->nomeRetorno =  $nomeArq;
             $historicoRetorno->save();
             $retorno['historico'] = $historicoRetorno;
+            $retorno['title'] = "Retorno";
             return redirect()->route('retorno', $retorno);
             //FIM TRAILER
         }else{
             return redirect()->back()->with('msg', 'Arquivo incompatível!');
         }
+    }
+    public function lerRetorno($nome){
+        $a = Storage::get("public/retorno/$nome");
+        dd($a);
+        $data['arquivo'] = $nome;
+
+        $remessa= file($nome);
+        for ($i = 1; $i < (sizeof($remessa) - 1); $i++) {
+
+        }
+        $data['title'] = "Arquivo Retorno $nome";
+        return view('verRetorno', $data);
     }
 }

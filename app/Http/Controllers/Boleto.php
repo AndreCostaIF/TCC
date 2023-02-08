@@ -42,10 +42,11 @@ class Boleto extends Controller
             return redirect()->route('index');
         } else {
             if ($data != null) {
-
+                $data['title'] = "Buscar boleto";
                 return view('boletoIndex', $data);
             } else {
-                return view('boletoIndex');
+                $data['title'] = "Buscar boleto";
+                return view('boletoIndex', $data);
             }
         }
     }
@@ -98,7 +99,7 @@ class Boleto extends Controller
             }
             $data['flag'] = 'cnpj';
         }
-
+        $data['title'] = "Buscar boleto";
         return view('boletoIndex', $data);
     }
 
@@ -152,9 +153,11 @@ class Boleto extends Controller
                 }
             }
 
-
             $data['boletos'] = $financeiro;
             $data['cliente'] = $pessoaFisica;
+            $nome = $data['cliente']['nome'];
+            $data['title'] = "$nome | Buscar boleto";
+
             return view('boletoIndex', $data);
         } else if ($flag == "cnpj") {
 
@@ -205,7 +208,8 @@ class Boleto extends Controller
             $data['cliente'] = $pessoaJuridica;
 
             //dd($financeiro);
-
+            $nome = $data['cliente']['fantasia'];
+            $data['title'] = "$nome | Buscar boleto";
             return view('boletoIndex', $data);
         }
     }
@@ -510,6 +514,7 @@ class Boleto extends Controller
         }
 
         $dados['data'] = "";
+        $dados['title'] = "Imprimir em massa";
         return view('massa', $dados);
     }
 
@@ -572,6 +577,7 @@ class Boleto extends Controller
 
 
         //dd($dados["boletos"]);
+        $dados['title'] = "Imprimir em massa";
         return view('massa', $dados);
     }
 

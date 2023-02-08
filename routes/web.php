@@ -23,9 +23,11 @@ Route::post('/login',  [LoginContoller::class, 'logar'])->name('login');
 Route::get('/logout',  [LoginContoller::class, 'sessionDestroy'])->name('logout');
 
 Route::get('/remessa', [TradutorRemessa::class, 'index'])->name('remessa');
+Route::get('/remessa/{nome}', [TradutorRemessa::class, 'lerRemessa'])->name('lerRemessa');
 Route::post('/traduzirRemessa',  [TradutorRemessa::class, 'traduzir'])->name('traduzirRemessa');
 
 Route::get('/retorno', [TradutorRetorno::class, 'index'])->name('retorno');
+Route::get('/retorno/{nome}', [TradutorRetorno::class, 'lerRetorno'])->name('lerRetorno');
 Route::post('/traduzirRetorno',  [TradutorRetorno::class, 'traduzirRetorno'])->name('traduzirRetorno');
 
 Route::get('/buscarBoleto', [Boleto::class, 'index'])->name('buscarBoleto');

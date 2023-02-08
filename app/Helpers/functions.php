@@ -18,6 +18,10 @@ function formatNumber($value)
     return number_format($value, 2, ',');
 }
 
+function formatar($valor) {
+    return number_format($valor / 100, 2, ',', '.');
+}
+
 function formatarCpf($cpf)
 {
 

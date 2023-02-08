@@ -39,6 +39,7 @@ class TradutorRemessa extends Controller
                     return view('remessa', $remessa);
                 } else {
                     $remessa['historico'] = historicoRemessa::pegarTodos();
+                    $remessa['title'] = "Remessa";
                     return view('remessa', $remessa);
                 }
             } else {
@@ -239,6 +240,7 @@ class TradutorRemessa extends Controller
                 fwrite($remessaSantader, $registroMovimento . "\n");
             }
 
+            //-------------------PIX----------------------
             $arquivoComRegistroSantander = file($nameArq);
             $tam = sizeof($arquivoComRegistroSantander) + 1;
 
@@ -258,7 +260,7 @@ class TradutorRemessa extends Controller
                 $chaveDict = completarPosicoes(ConstantesPIX::PIX_KEY, 77, '0');
                 $txid = 'YK'.'T'. '076924250' . '00000' . substr($x, 63, 8) . date('dmy');
                 $txidCompleto = completarPosicoes($txid, 35, '0');
-                //dd(strlen($txid));
+
                 $brancos239 = str_pad("", 239, " ");
                 $numSequencial =  completarPosicoes($tam, 6, '0');
 
@@ -276,7 +278,6 @@ class TradutorRemessa extends Controller
 
                 $tam++;
             }
-
 
             $arquivoComRegistroSantander = file($nameArq);
             $x = $remessaBradesco[sizeof($remessaBradesco) - 1];
@@ -296,6 +297,7 @@ class TradutorRemessa extends Controller
             $numSequencialTrailer = completarPosicoes($tam++, 6, '0'); // 395 - 400 (006)
 
 
+
             $trailer = $codigoRegistro . $quantidadeLinhas . $valorTotal . $zeros . $numSequencialTrailer;
             fwrite($remessaSantader, $trailer);
             //dd($remessaSantader);
@@ -312,10 +314,68 @@ class TradutorRemessa extends Controller
             $remessa['historico'] = $historicoRemessa;
 
 
-
+            $remessa['title'] = "Tradutor remessa";
             return redirect()->route('remessa', $remessa);
         }else{
             return redirect()->back()->with('msg', 'Arquivo incompatível!');
         }
+    }
+
+    public function lerRemessa($nome){
+
+        $remessa= file($nome);
+        //dd(end($remessa));
+        $cont = 0;
+        $data['cliente'] = [];
+        //$santoandre = new Santander();
+        for ($i = 1; $i < (sizeof($remessa) - 1); $i++) {
+            $x = $remessa[$i];
+            if(substr($x, 0, 1) != '8'){
+
+                $data['cliente'][$i]['controleParticipante'] = "". intval(substr($x, 37, 25)); // 038 - 062 (025)
+                $data['cliente'][$i]['nossoNumero'] = substr($x, 62, 8);
+                $data['cliente'][$i]['ocorrencia'] = substr($x, 108, 2);
+                $data['cliente'][$i]['valorTitulo']  = "". intval(substr($x, 126, 13));
+                $data['cliente'][$i]['numDoc']  = "". intval(substr($x, 110, 10));
+                $data['cliente'][$i]['vencimento'] = substr($x, 120, 6); // 121 - 126 (006)
+                $data['cliente'][$i]['vencimento'] = substr($data['cliente'][$i]['vencimento'], 0, 2) . '-' . substr($data['cliente'][$i]['vencimento'], 2, 2) . '-' . "20". substr($data['cliente'][$i]['vencimento'], 4, 2);
+                $data['cliente'][$i]['especieBoleto'] = substr($x, 147, 2);
+                $data['cliente'][$i]['identificacaoSacado'] = substr($x, 218, 2); // 219 - 220 (002)
+                $data['cliente'][$i]['nome'] = rtrim(substr($x, 234, 40)); // 225 - 274 (040)
+                $data['cliente'][$i]['endereco'] =  rtrim(substr($x, 274, 40));
+
+                $cep = substr($x, 326, 5); // 327 - 331 (005)
+                $complementoCep = substr($x, 331, 3); // 332 - 334 (3)
+                $cepCompleto = $cep . $complementoCep; // 327 - 334 (008)
+
+                if ($cepCompleto != '59215000') {
+
+                    $resultado =  Cidades::buscarCidade($cepCompleto);
+                    $municipio = strtoupper($resultado->cidade); // 335 - 349 (015)
+                    $ufSacado =  strtoupper($resultado->sigla); // 350 - 351 (002)
+
+                } else {
+                    $municipio = 'NOVA CRUZ'; // 335 - 349 (015)
+                    $ufSacado =  "RN"; // 350 - 351 (002)
+                }
+                $data['cliente'][$i]['cep'] = $cepCompleto;
+                $data['cliente'][$i]['cidade'] = $municipio;
+                $data['cliente'][$i]['uf'] = $ufSacado;
+                $data['cliente'][$i]['sequencial'] = substr($x, 394, 6);
+
+                $cont++;
+            }
+        }
+        $data['valorDoLote'] = intval(substr(end($remessa), 7, 13));
+        //dd($data);
+        $data['totalNoLote'] =  $cont;
+        $data['arquivo'] = $nome;
+        $data['cliente'] = paginate($data['cliente'], 50);
+
+        $data['cliente']->withPath("/remessa/$nome");
+        //dd($data);
+        $data['title'] = "Arquivo remessa $nome";
+
+        return view('verRemessa', $data);
     }
 }

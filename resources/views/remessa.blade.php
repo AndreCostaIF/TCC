@@ -75,7 +75,8 @@
                         <th scope="col" class="text-danger">ID</th>
                         <th scope="col" class="text-danger">Traduzido em</th>
                         <th scope="col" class="text-danger">Usuário</th>
-                        <th scope="col" class="text-danger">Arquivo </th>
+                        <th scope="col" class="text-danger">Arquivo</th>
+                        <th scope="col" class="text-danger">Visualizar</th>
                     </tr>
                 </thead>
                 <div class=" d-flex justify-content-center">
@@ -92,6 +93,11 @@
                                 <a class="" href="{{ asset($item->nomeRemessa) }}" download>
                                     <i class="bi bi-download"></i>
                                     {{ $item->nomeRemessa }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ route("lerRemessa", ['nome'=>"$item->nomeRemessa"]) }}" target='_blank'>
+                                    <i class="bi bi-eye"></i> Visualizar
                                 </a>
                             </td>
                         </tr>

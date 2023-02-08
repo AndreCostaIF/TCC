@@ -68,7 +68,8 @@ class PixController extends Controller
     public function index(Request $request)
     {
 
-        return view('dashboardPix');
+        $data['title'] = "Pix";
+        return view('dashboardPix', $data);
 
     }
 
