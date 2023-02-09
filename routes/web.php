@@ -28,6 +28,7 @@ Route::post('/traduzirRemessa',  [TradutorRemessa::class, 'traduzir'])->name('tr
 
 Route::get('/retorno', [TradutorRetorno::class, 'index'])->name('retorno');
 Route::get('/retorno/{nome}', [TradutorRetorno::class, 'lerRetorno'])->name('lerRetorno');
+Route::get('/retorno/enviar/{nome}', [TradutorRetorno::class, 'enviarRetorno'])->name('enviarRetorno');
 Route::post('/traduzirRetorno',  [TradutorRetorno::class, 'traduzirRetorno'])->name('traduzirRetorno');
 
 Route::get('/buscarBoleto', [Boleto::class, 'index'])->name('buscarBoleto');

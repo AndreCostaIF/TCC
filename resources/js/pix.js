@@ -128,6 +128,13 @@ document.getElementById("toastbtn").onclick = function () {
     toast.show()
 }
 
+if($('.send').length){
+
+    const toastLiveExample = document.getElementById('notificacaoRetorno')
+    const toast = new bootstrap.Toast(toastLiveExample)
+    toast.show()
+}
+
 
 const modalCobranca = document.getElementById('modalCobranca')
 const modalCobranca2 = document.getElementById('modalCobranca2')
