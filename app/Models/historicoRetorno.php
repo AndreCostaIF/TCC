@@ -17,4 +17,9 @@ class historicoRetorno extends Model
        $a = DB::connection('mysql2')->table('historico_retorno')->orderBy('dataTraducao', 'desc')->paginate(10);
         return $a;
     }
+
+    public static function setEnviar($nome){
+        $sql = DB::connection('mysql2')->table('historico_retorno')->where('nomeRetorno', $nome)->update(['enviado'=>1]);
+        return $sql;
+    }
 }

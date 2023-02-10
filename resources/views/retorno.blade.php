@@ -61,17 +61,13 @@
 @endif
 
 @if (session()->has('enviado'))
-    <div class="send">
-        <div id="notificacaoRetorno" class="toast position-fixed border border-danger shadow top-50 start-50 translate-middle p-3" >
-            <div class="toast-header shadow bg-danger">
-            <strong class="me-auto text-light fw-bold"><i class="bi bi-bell"></i> Notificação</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-            </div>
-            <div class="toast-body ">
-            <span class="text-success h6"><i class="bi bi-clipboard2-check"></i> Retorno enviado!</span>
-            </div>
-        </div>
+<div class="d-flex mt-3 justify-content-center">
+    <div class="alert alert-success border border-success  alert-dismissible fade show mt-3" role="alert">
+        <strong><i class="bi bi-send-check"></i> Retorno enviado! </strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+</div>
+
 @endif
 
 
@@ -91,7 +87,7 @@
                         <th scope="col" class="text-danger">Usuário</th>
                         <th scope="col" class="text-danger">Arquivo </th>
                         <th scope="col" class="text-danger">Visualizar</th>
-                        <th scope="col" class="text-danger">Enviado</th>
+                        <th scope="col" class="text-danger">Enviar</th>
                     </tr>
                 </thead>
                 <div class=" d-flex justify-content-center">
@@ -116,9 +112,14 @@
                                 </a>
                             </td>
                             <td>
-                                <a href="{{ route("enviarRetorno", ['nome'=>"$item->nomeRetorno"]) }}">
-                                    <i class="bi bi-send"></i> Enviar
-                                </a>
+                                @if ($item->enviado != null)
+                                    <span class="text-success"><i class="bi bi-send-check"></i> enviado</span>
+                                @else
+
+                                    <a href="{{ route("enviarRetorno", ['nome'=>"$item->nomeRetorno"]) }}">
+                                        <i class="bi bi-send"></i> Enviar
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
